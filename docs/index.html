@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cup/core — Component Playground &amp; Design System</title>
+  <meta name="description" content="Interactive playground for cup/core — a zero-dependency design system with 25+ Web Components, CSS design tokens, and dual JS/WASM runtime.">
+  <meta name="keywords" content="design system, web components, CSS tokens, WASM, accessibility, cup-ui, codeupipe">
+  <meta name="author" content="codeupipe">
+  <link rel="canonical" href="https://orchestrate-solutions.github.io/cup/docs/">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="cup/core — Component Playground & Design System">
+  <meta property="og:description" content="25+ accessible Web Components with CSS design tokens, dual JS/WASM runtime, and interactive playground. Zero dependencies.">
+  <meta property="og:url" content="https://orchestrate-solutions.github.io/cup/docs/">
+  <meta property="og:site_name" content="cup/core">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://orchestrate-solutions.github.io/cup/docs/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="cup/core design system preview showing field, button, and toggle components">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="cup/core — Component Playground & Design System">
+  <meta name="twitter:description" content="25+ accessible Web Components with CSS design tokens, dual JS/WASM runtime, and interactive playground.">
+  <meta name="twitter:image" content="https://orchestrate-solutions.github.io/cup/docs/og-image.png">
+  <meta name="twitter:image:alt" content="cup/core design system preview showing field, button, and toggle components">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "cup/core",
+    "applicationCategory": "DeveloperApplication",
+    "description": "Zero-dependency design system with 25+ Web Components, CSS design tokens, and dual JS/WASM runtime.",
+    "url": "https://orchestrate-solutions.github.io/cup/docs/",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "license": "https://opensource.org/licenses/Apache-2.0",
+    "author": {
+      "@type": "Organization",
+      "name": "codeupipe",
+      "url": "https://github.com/orchestrate-solutions/cup"
+    }
+  }
+  </script>
+
+  <!-- Breadcrumb Navigation -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "codeupipe", "item": "https://github.com/orchestrate-solutions/cup" },
+      { "@type": "ListItem", "position": 2, "name": "cup/core", "item": "https://orchestrate-solutions.github.io/cup/" },
+      { "@type": "ListItem", "position": 3, "name": "Playground", "item": "https://orchestrate-solutions.github.io/cup/docs/" }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="../cup.css">
+  <script type="module" src="../cup.js"></script>
+  <link rel="stylesheet" href="playground.css">
+</head>
+<body>
+
+  <div class="cup-shell">
+    <a href="#main" class="cup-skip-link">Skip to content</a>
+    <!-- ── Header ── -->
+    <header class="cup-shell___header">
+      <button class="cup-shell___menu-btn" id="menu-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <strong style="font-size:var(--cup-font-size-lg);">cup/core</strong>
+      <span style="color:var(--cup-color-secondary);font-size:var(--cup-font-size-sm);">Component Playground</span>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:var(--cup-space-md);">
+        <cup-toggle label="Light" id="theme-toggle"></cup-toggle>
+      </div>
+    </header>
+
+    <!-- ── Sidebar Nav ── -->
+    <aside class="cup-shell___sidebar" id="sidebar">
+      <nav>
+        <h3 class="pg-nav-heading">Nano</h3>
+        <a href="#label" class="pg-nav-link" data-section="label">Label</a>
+        <a href="#input" class="pg-nav-link" data-section="input">Input</a>
+        <a href="#hint" class="pg-nav-link" data-section="hint">Hint</a>
+        <a href="#error" class="pg-nav-link" data-section="error">Error</a>
+        <a href="#icon" class="pg-nav-link" data-section="icon">Icon</a>
+        <a href="#skeleton" class="pg-nav-link" data-section="skeleton">Skeleton</a>
+        <a href="#divider" class="pg-nav-link" data-section="divider">Divider</a>
+
+        <h3 class="pg-nav-heading">Micro — Fields</h3>
+        <a href="#field" class="pg-nav-link" data-section="field">Field</a>
+        <a href="#select" class="pg-nav-link" data-section="select">Select</a>
+        <a href="#textarea" class="pg-nav-link" data-section="textarea">Textarea</a>
+        <a href="#number" class="pg-nav-link" data-section="number">Number</a>
+        <a href="#slider" class="pg-nav-link" data-section="slider">Slider</a>
+        <a href="#password" class="pg-nav-link" data-section="password">Password</a>
+        <a href="#date" class="pg-nav-link" data-section="date">Date</a>
+        <a href="#file" class="pg-nav-link" data-section="file">File</a>
+        <a href="#checkbox" class="pg-nav-link" data-section="checkbox">Checkbox</a>
+        <a href="#radio" class="pg-nav-link" data-section="radio">Radio Group</a>
+
+        <h3 class="pg-nav-heading">Micro — Actions</h3>
+        <a href="#button" class="pg-nav-link" data-section="button">Button</a>
+        <a href="#toggle" class="pg-nav-link" data-section="toggle">Toggle</a>
+        <a href="#badge" class="pg-nav-link" data-section="badge">Badge</a>
+        <a href="#chip" class="pg-nav-link" data-section="chip">Chip</a>
+
+        <h3 class="pg-nav-heading">Component</h3>
+        <a href="#stepper" class="pg-nav-link" data-section="stepper">Stepper</a>
+        <a href="#progress" class="pg-nav-link" data-section="progress">Progress</a>
+        <a href="#toast" class="pg-nav-link" data-section="toast">Toast</a>
+        <a href="#effects" class="pg-nav-link" data-section="effects">Effects</a>
+
+        <h3 class="pg-nav-heading">Tools</h3>
+        <a href="#tokens" class="pg-nav-link" data-section="tokens">Token Editor</a>
+        <a href="#presets" class="pg-nav-link" data-section="presets">Theme Presets</a>
+        <a href="#style-inspector" class="pg-nav-link" data-section="style-inspector">Style Inspector</a>
+        <a href="#wasm" class="pg-nav-link" data-section="wasm">WASM Runtime</a>
+        <a href="#metrics" class="pg-nav-link" data-section="metrics">Style Metrics</a>
+      </nav>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="cup-shell___main" id="main">
+      <h1 class="cup-sr-only">cup/core Component Playground</h1>
+      <!-- Sections loaded by playground.js -->
+      <noscript>
+        <div style="padding:2rem;max-width:720px;margin:auto;">
+          <h2>About cup/core</h2>
+          <p>cup/core is a zero-dependency design system featuring 25+ accessible Web Components, CSS design tokens, and a dual JS/WASM runtime.</p>
+
+          <h2>Nano Components</h2>
+          <dl>
+            <dt><code>&lt;cup-label&gt;</code></dt><dd>Form input label with optional required indicator. Accessible via for attribute.</dd>
+            <dt><code>&lt;cup-input&gt;</code></dt><dd>Text input with placeholder, prefilled values, and disabled states.</dd>
+            <dt><code>&lt;cup-hint&gt;</code></dt><dd>Helper text displayed below a form field to guide user input.</dd>
+            <dt><code>&lt;cup-error&gt;</code></dt><dd>Validation error message displayed below a form field.</dd>
+            <dt><code>&lt;cup-icon&gt;</code></dt><dd>Accessible SVG icon wrapper with size variants and aria-label support.</dd>
+            <dt><code>&lt;cup-skeleton&gt;</code></dt><dd>Loading placeholder with text, circle, and rectangle variants.</dd>
+            <dt><code>&lt;cup-divider&gt;</code></dt><dd>Visual separator between content sections.</dd>
+          </dl>
+
+          <h2>Micro Components — Fields</h2>
+          <dl>
+            <dt><code>&lt;cup-field&gt;</code></dt><dd>Composed form field with label, input, hint, and error in one component.</dd>
+            <dt><code>&lt;cup-select&gt;</code></dt><dd>Dropdown selection with JSON-based options and disabled state.</dd>
+            <dt><code>&lt;cup-textarea&gt;</code></dt><dd>Multi-line text input with character limit and hint support.</dd>
+            <dt><code>&lt;cup-number&gt;</code></dt><dd>Numeric input with min, max, and step constraints.</dd>
+            <dt><code>&lt;cup-slider&gt;</code></dt><dd>Range slider with live value display, step precision, and disabled state.</dd>
+            <dt><code>&lt;cup-password&gt;</code></dt><dd>Password input with show/hide toggle, minlength validation, and hint.</dd>
+            <dt><code>&lt;cup-date&gt;</code></dt><dd>Date picker with min/max range constraints and required validation.</dd>
+            <dt><code>&lt;cup-file&gt;</code></dt><dd>File upload with accept filters, multiple selection, and preview.</dd>
+            <dt><code>&lt;cup-checkbox&gt;</code></dt><dd>Checkbox input with label, pre-checked, and disabled states.</dd>
+            <dt><code>&lt;cup-radio-group&gt;</code></dt><dd>Radio button group with JSON-based options and default selection.</dd>
+          </dl>
+
+          <h2>Micro Components — Actions</h2>
+          <dl>
+            <dt><code>&lt;cup-button&gt;</code></dt><dd>Button with primary, secondary, ghost, and danger variants. Supports sizes, rounded, loading, and disabled states.</dd>
+            <dt><code>&lt;cup-toggle&gt;</code></dt><dd>On/off switch with label, pressed state, and disabled support.</dd>
+            <dt><code>&lt;cup-badge&gt;</code></dt><dd>Status indicator with success, error, warning, and info variants.</dd>
+            <dt><code>&lt;cup-chip&gt;</code></dt><dd>Tag chip with optional remove button for filter and selection UIs.</dd>
+          </dl>
+
+          <h2>Organism Components</h2>
+          <dl>
+            <dt><code>&lt;cup-stepper&gt;</code></dt><dd>Multi-step progress indicator with linear mode and programmatic navigation.</dd>
+            <dt><code>&lt;cup-progress&gt;</code></dt><dd>Progress bar with determinate, indeterminate, and variant-colored modes.</dd>
+            <dt><code>&lt;cup-toast&gt;</code></dt><dd>Notification toast with auto-dismissal, variants, and programmatic API.</dd>
+          </dl>
+
+          <h2>Features</h2>
+          <ul>
+            <li>60+ CSS design tokens for color, spacing, typography, shape, and motion</li>
+            <li>Dark and light themes with automatic OS preference detection</li>
+            <li>WCAG 2.1 AA accessible — focus rings, skip links, reduced motion, high contrast</li>
+            <li>Fluid responsive typography and 44px touch targets</li>
+            <li>Optional WASM runtime for compute-heavy processing</li>
+          </ul>
+          <p>Enable JavaScript to interact with the live component playground.</p>
+        </div>
+      </noscript>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer id="site-footer" class="cup-shell___footer">
+      <span id="build-commit">cup/core — loading…</span>
+    </footer>
+  </div>
+
+  <script src="playground.js" type="module"></script>
+</body>
+</html>

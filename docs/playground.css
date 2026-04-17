@@ -1,0 +1,276 @@
+/* playground.css — Styles for the cup/core Component Playground */
+
+/* ── Layout overrides ── */
+body {
+  margin: 0;
+  background: var(--cup-color-surface);
+  color: var(--cup-color-on-surface);
+  font-family: var(--cup-font-family);
+}
+
+/* ── Sidebar nav ── */
+.pg-nav-heading {
+  font-size: var(--cup-font-size-xs);
+  font-weight: var(--cup-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cup-color-secondary);
+  margin: var(--cup-space-lg) 0 var(--cup-space-xs) 0;
+  padding: 0;
+}
+
+.pg-nav-heading:first-child {
+  margin-top: 0;
+}
+
+.pg-nav-link {
+  display: block;
+  padding: var(--cup-space-xs) var(--cup-space-sm);
+  font-size: var(--cup-font-size-sm);
+  color: var(--cup-color-on-surface);
+  text-decoration: none;
+  border-radius: var(--cup-radius-sm);
+  transition: background-color var(--cup-transition-fast);
+}
+
+.pg-nav-link:hover {
+  background: var(--cup-color-surface-alt);
+}
+
+.pg-nav-link[aria-current="true"] {
+  background: var(--cup-color-surface-alt);
+  color: var(--cup-color-primary);
+  font-weight: var(--cup-font-weight-medium);
+}
+
+/* ── Section cards ── */
+.pg-section {
+  margin-bottom: var(--cup-space-2xl);
+  scroll-margin-top: var(--cup-space-lg);
+}
+
+.pg-section-title {
+  font-size: var(--cup-font-size-xl);
+  font-weight: var(--cup-font-weight-bold);
+  margin: 0 0 var(--cup-space-xs) 0;
+}
+
+.pg-section-tag {
+  font-size: var(--cup-font-size-sm);
+  color: var(--cup-color-secondary);
+  font-family: var(--cup-font-family-mono);
+  margin: 0 0 var(--cup-space-xs) 0;
+}
+
+.pg-section-desc {
+  font-size: var(--cup-font-size-sm);
+  color: var(--cup-color-on-surface);
+  opacity: 0.75;
+  margin: 0 0 var(--cup-space-lg) 0;
+  max-width: 60ch;
+}
+
+/* ── Demo area ── */
+.pg-demo {
+  padding: var(--cup-space-lg);
+  background: var(--cup-color-surface-alt);
+  border: 1px solid var(--cup-color-border);
+  border-radius: var(--cup-radius-md);
+  margin-bottom: var(--cup-space-md);
+}
+
+.pg-demo-row {
+  display: flex;
+  gap: var(--cup-space-md);
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.pg-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--cup-space-md);
+}
+
+/* ── Code snippet ── */
+.pg-code {
+  position: relative;
+  margin-bottom: var(--cup-space-md);
+}
+
+.pg-code pre {
+  margin: 0;
+  padding: var(--cup-space-md);
+  background: var(--cup-color-surface);
+  border: 1px solid var(--cup-color-border);
+  border-radius: var(--cup-radius-md);
+  font-family: var(--cup-font-family-mono);
+  font-size: var(--cup-font-size-sm);
+  overflow-x: auto;
+  color: var(--cup-color-on-surface);
+  line-height: 1.6;
+}
+
+.pg-code-copy {
+  position: absolute;
+  top: var(--cup-space-sm);
+  right: var(--cup-space-sm);
+  padding: var(--cup-space-2xs) var(--cup-space-sm);
+  font-size: var(--cup-font-size-xs);
+  background: var(--cup-color-surface-alt);
+  color: var(--cup-color-secondary);
+  border: 1px solid var(--cup-color-border);
+  border-radius: var(--cup-radius-sm);
+  cursor: pointer;
+}
+
+.pg-code-copy:hover {
+  color: var(--cup-color-on-surface);
+}
+
+/* ── Variant sub-heading ── */
+.pg-variant-label {
+  font-size: var(--cup-font-size-sm);
+  font-weight: var(--cup-font-weight-medium);
+  color: var(--cup-color-secondary);
+  margin: var(--cup-space-md) 0 var(--cup-space-sm) 0;
+}
+
+/* ── Token editor ── */
+.pg-token-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--cup-space-sm);
+}
+
+.pg-token-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cup-space-sm);
+}
+
+.pg-token-name {
+  font-family: var(--cup-font-family-mono);
+  font-size: var(--cup-font-size-xs);
+  color: var(--cup-color-secondary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pg-token-input {
+  width: 3rem;
+  height: 2rem;
+  border: 1px solid var(--cup-color-border);
+  border-radius: var(--cup-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+}
+
+/* ── Preset cards ── */
+.pg-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--cup-space-md);
+}
+
+.pg-preset-card {
+  padding: var(--cup-space-md);
+  border: 2px solid var(--cup-color-border);
+  border-radius: var(--cup-radius-md);
+  cursor: pointer;
+  transition: border-color var(--cup-transition-fast);
+  text-align: center;
+}
+
+.pg-preset-card:hover {
+  border-color: var(--cup-color-primary);
+}
+
+.pg-preset-card[aria-selected="true"] {
+  border-color: var(--cup-color-primary);
+  background: color-mix(in srgb, var(--cup-color-primary) 10%, transparent);
+}
+
+.pg-preset-swatch {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: var(--cup-space-sm);
+}
+
+.pg-preset-swatch span {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--cup-radius-full);
+  border: 1px solid var(--cup-color-border);
+}
+
+.pg-preset-name {
+  font-size: var(--cup-font-size-sm);
+  font-weight: var(--cup-font-weight-medium);
+}
+
+/* ── Control bar (variant + animation toggles) ── */
+.pg-ctrl-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cup-space-sm);
+  align-items: center;
+  padding-bottom: var(--cup-space-md);
+  margin-bottom: var(--cup-space-md);
+  border-bottom: 1px solid var(--cup-color-border);
+}
+
+.pg-ctrl-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cup-space-2xs);
+}
+
+.pg-ctrl-label {
+  font-size: var(--cup-font-size-xs);
+  font-family: var(--cup-font-family-mono);
+  color: var(--cup-color-secondary);
+  margin-right: var(--cup-space-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pg-ctrl-chip {
+  font-size: var(--cup-font-size-xs);
+  padding: var(--cup-space-2xs) var(--cup-space-sm);
+  border: 1px solid var(--cup-color-border);
+  border-radius: var(--cup-radius-full);
+  background: transparent;
+  color: var(--cup-color-on-surface);
+  cursor: pointer;
+  transition: background-color var(--cup-transition-fast),
+              border-color var(--cup-transition-fast),
+              color var(--cup-transition-fast);
+}
+
+.pg-ctrl-chip:hover {
+  border-color: var(--cup-color-primary);
+  color: var(--cup-color-primary);
+}
+
+.pg-ctrl-chip--active {
+  background: var(--cup-color-primary);
+  border-color: var(--cup-color-primary);
+  color: var(--cup-color-on-primary);
+}
+
+
+
+/* ── Global motion kill (mirrors prefers-reduced-motion) ── */
+.pg-motion-off *,
+.pg-motion-off *::before,
+.pg-motion-off *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}

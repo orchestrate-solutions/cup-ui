@@ -1,0 +1,5 @@
+# cup/core — Component Playground
+User-agent: *
+Allow: /
+
+Sitemap: https://orchestrate-solutions.github.io/cup/docs/sitemap.xml

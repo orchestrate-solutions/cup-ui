@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>cup-ui: StyleTap + Effects + Lifecycle Hooks — Tests</title>
+  <link rel="stylesheet" href="../cup.css">
+  <style>
+    body { font-family: var(--cup-font-family-mono); padding: 1rem; background: var(--cup-color-surface); color: var(--cup-color-on-surface); }
+    .pass { color: #4caf50; } .fail { color: #f44336; }
+    .result { margin: 0.25rem 0; font-size: 0.85rem; }
+    h2 { margin-top: 1.5rem; }
+    #test-arena { visibility: hidden; position: absolute; top: -9999px; }
+  </style>
+</head>
+<body>
+  <h1>cup-ui Test Suite</h1>
+  <div id="results"></div>
+  <div id="test-arena"></div>
+
+  <script type="module">
+    import { Payload, Pipeline } from './cup-pipe.js';
+    import { StyleTap } from './filters/style_tap.js';
+    import { CupElement } from '../cup-element.js';
+
+    const results = document.getElementById('results');
+    const arena = document.getElementById('test-arena');
+    let passed = 0, failed = 0;
+
+    function assert(condition, name) {
+      if (condition) {
+        passed++;
+        results.innerHTML += `<div class="result pass">✓ ${name}</div>`;
+      } else {
+        failed++;
+        results.innerHTML += `<div class="result fail">✗ ${name}</div>`;
+      }
+    }
+
+    // ── StyleTap Tests ──────────────────────────────────────
+    results.innerHTML += '<h2>StyleTap</h2>';
+
+    // Test 1: inspect returns structured report
+    {
+      const div = document.createElement('div');
+      div.className = 'cup-button cup-button--primary';
+      div.textContent = 'Test';
+      arena.appendChild(div);
+
+      // Allow styles to compute
+      await new Promise(r => requestAnimationFrame(r));
+
+      const report = StyleTap.inspect(div);
+      assert(report.tag === 'div', 'inspect: tag is "div"');
+      assert(report.classes.includes('cup-button'), 'inspect: classes include cup-button');
+      assert(typeof report.layers === 'object', 'inspect: layers is object');
+      assert(typeof report.computed === 'object', 'inspect: computed is object');
+      assert(typeof report.tokens === 'object', 'inspect: tokens is object');
+
+      div.remove();
+    }
+
+    // Test 2: layer detection for nano elements
+    {
+      const layers = StyleTap._detectLayers(['cup-label']);
+      assert(layers.includes('cup-nano'), 'detectLayers: cup-label → cup-nano');
+      assert(layers.includes('cup-reset'), 'detectLayers: always includes cup-reset');
+      assert(layers.includes('cup-theme'), 'detectLayers: always includes cup-theme');
+    }
+
+    // Test 3: layer detection for micro elements
+    {
+      const layers = StyleTap._detectLayers(['cup-button', 'cup-button--primary']);
+      assert(layers.includes('cup-micro'), 'detectLayers: cup-button → cup-micro');
+    }
+
+    // Test 4: layer detection for component elements
+    {
+      const layers = StyleTap._detectLayers(['cup-card']);
+      assert(layers.includes('cup-component'), 'detectLayers: cup-card → cup-component');
+    }
+
+    // Test 5: inspect captures active tokens
+    {
+      const div = document.createElement('div');
+      div.className = 'cup-input';
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const report = StyleTap.inspect(div);
+      assert('--cup-color-surface' in report.tokens, 'inspect: captures --cup-color-surface token');
+      assert('--cup-color-on-surface' in report.tokens, 'inspect: captures --cup-color-on-surface token');
+
+      div.remove();
+    }
+
+    // Test 6: Tap observe interface (doesn't throw)
+    {
+      const tap = new StyleTap();
+      const main = document.createElement('div');
+      main.innerHTML = '<div class="cup-button">A</div><div class="cup-label">B</div>';
+      arena.appendChild(main);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const payload = new Payload({ main });
+      let threw = false;
+      try { tap.observe(payload); } catch { threw = true; }
+      assert(!threw, 'observe: does not throw');
+
+      main.remove();
+    }
+
+    // Test 7: overlay toggle
+    {
+      const div = document.createElement('div');
+      div.className = 'cup-card';
+      div.style.position = 'relative';
+      div.innerHTML = '<div class="cup-card___body">Test</div>';
+      arena.appendChild(div);
+      arena.style.visibility = 'visible';
+      arena.style.position = 'static';
+      await new Promise(r => requestAnimationFrame(r));
+
+      StyleTap.overlay(div);
+      assert(div.querySelector('.cup-style-overlay') !== null, 'overlay: creates overlay element');
+
+      StyleTap.overlay(div);
+      assert(div.querySelector('.cup-style-overlay') === null, 'overlay: toggles off on second call');
+
+      div.remove();
+      arena.style.visibility = 'hidden';
+      arena.style.position = 'absolute';
+    }
+
+    // ── Effects Tests ───────────────────────────────────────
+    results.innerHTML += '<h2>Effects</h2>';
+
+    // Test 8: data-effect applies animation
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'fade-in');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const style = getComputedStyle(div);
+      const anim = style.animationName;
+      assert(anim === 'cup-fade-in', `fade-in: animation-name is "cup-fade-in" (got "${anim}")`);
+
+      div.remove();
+    }
+
+    // Test 9: slide-up effect
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'slide-up');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const anim = getComputedStyle(div).animationName;
+      assert(anim === 'cup-slide-up', `slide-up: animation-name is "cup-slide-up" (got "${anim}")`);
+
+      div.remove();
+    }
+
+    // Test 10: scale-in effect
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'scale-in');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const anim = getComputedStyle(div).animationName;
+      assert(anim === 'cup-scale-in', `scale-in: animation-name is "cup-scale-in" (got "${anim}")`);
+
+      div.remove();
+    }
+
+    // Test 11: pulse effect
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'pulse');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const style = getComputedStyle(div);
+      assert(style.animationName === 'cup-pulse', 'pulse: animation-name is cup-pulse');
+      assert(style.animationIterationCount === 'infinite', 'pulse: infinite iteration');
+
+      div.remove();
+    }
+
+    // Test 12: shake effect
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'shake');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const anim = getComputedStyle(div).animationName;
+      assert(anim === 'cup-shake', `shake: animation-name is "cup-shake" (got "${anim}")`);
+
+      div.remove();
+    }
+
+    // Test 13: speed modifier
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'fade-in');
+      div.setAttribute('data-effect-speed', 'fast');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const dur = getComputedStyle(div).animationDuration;
+      assert(dur === '0.15s' || dur === '150ms', `speed=fast: duration is 150ms (got "${dur}")`);
+
+      div.remove();
+    }
+
+    // Test 14: delay modifier
+    {
+      const div = document.createElement('div');
+      div.setAttribute('data-effect', 'fade-in');
+      div.setAttribute('data-effect-delay', '300');
+      arena.appendChild(div);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const delay = getComputedStyle(div).animationDelay;
+      assert(delay === '0.3s' || delay === '300ms', `delay=300: animation-delay is 300ms (got "${delay}")`);
+
+      div.remove();
+    }
+
+    // ── CupElement Lifecycle Hooks Tests ────────────────────
+    results.innerHTML += '<h2>CupElement Lifecycle Hooks</h2>';
+
+    // Test 15: useHook is available
+    {
+      // Register a custom element for testing
+      class CupTestEl extends CupElement {
+        static get observedAttributes() { return ['value']; }
+        render() { this.textContent = this.attr('value') || 'default'; }
+      }
+      if (!customElements.get('cup-test-hook')) {
+        customElements.define('cup-test-hook', CupTestEl);
+      }
+
+      const el = document.createElement('cup-test-hook');
+      assert(typeof el.useHook === 'function', 'useHook: method exists on CupElement');
+    }
+
+    // Test 16: onConnect hook fires
+    {
+      const el = document.createElement('cup-test-hook');
+      let connected = false;
+      el.useHook({ onConnect: () => { connected = true; } });
+      arena.appendChild(el);
+      await new Promise(r => requestAnimationFrame(r));
+      assert(connected === true, 'onConnect: fires when element is added to DOM');
+      el.remove();
+    }
+
+    // Test 17: onDisconnect hook fires
+    {
+      const el = document.createElement('cup-test-hook');
+      let disconnected = false;
+      el.useHook({ onDisconnect: () => { disconnected = true; } });
+      arena.appendChild(el);
+      await new Promise(r => requestAnimationFrame(r));
+      el.remove();
+      assert(disconnected === true, 'onDisconnect: fires when element is removed');
+    }
+
+    // Test 18: beforeRender / afterRender hooks fire
+    {
+      const el = document.createElement('cup-test-hook');
+      const events = [];
+      el.useHook({
+        beforeRender: () => events.push('before'),
+        afterRender: () => events.push('after'),
+      });
+      arena.appendChild(el);
+      await new Promise(r => requestAnimationFrame(r));
+      assert(events.includes('before'), 'beforeRender: fires before render');
+      assert(events.includes('after'), 'afterRender: fires after render');
+      assert(events.indexOf('before') < events.indexOf('after'), 'lifecycle: before fires before after');
+      el.remove();
+    }
+
+    // Test 19: onAttributeChange hook fires with old/new values
+    {
+      const el = document.createElement('cup-test-hook');
+      let attrEvent = null;
+      el.useHook({
+        onAttributeChange: (_el, name, oldVal, newVal) => {
+          attrEvent = { name, oldVal, newVal };
+        }
+      });
+      arena.appendChild(el);
+      await new Promise(r => requestAnimationFrame(r));
+
+      el.setAttribute('value', 'hello');
+      await new Promise(r => requestAnimationFrame(r));
+
+      assert(attrEvent !== null, 'onAttributeChange: fires on attribute set');
+      assert(attrEvent.name === 'value', 'onAttributeChange: reports attribute name');
+      assert(attrEvent.newVal === 'hello', 'onAttributeChange: reports new value');
+      el.remove();
+    }
+
+    // Test 20: multiple hooks on same element
+    {
+      const el = document.createElement('cup-test-hook');
+      let a = false, b = false;
+      el.useHook({ onConnect: () => { a = true; } });
+      el.useHook({ onConnect: () => { b = true; } });
+      arena.appendChild(el);
+      await new Promise(r => requestAnimationFrame(r));
+      assert(a && b, 'multiple hooks: both fire on connect');
+      el.remove();
+    }
+
+    // ── Pipeline Integration Tests ──────────────────────────
+    results.innerHTML += '<h2>Pipeline Integration</h2>';
+
+    // Test 21: StyleTap works as pipeline tap
+    {
+      const main = document.createElement('div');
+      main.innerHTML = '<div class="cup-button">X</div>';
+      arena.appendChild(main);
+      await new Promise(r => requestAnimationFrame(r));
+
+      const pipeline = new Pipeline()
+        .addFilter({ async call(p) { return p.insert('step1', true); } }, 'Step1')
+        .addTap(new StyleTap(), 'StyleTap');
+
+      pipeline.observe({ timing: true });
+      const result = await pipeline.run(new Payload({ main }));
+
+      assert(result.get('step1') === true, 'pipeline: filter payload flows through tap');
+      assert(pipeline.state.executed.includes('StyleTap'), 'pipeline: StyleTap registered as executed');
+      assert(typeof pipeline.state.timings['Step1'] === 'number', 'pipeline: timing recorded');
+
+      main.remove();
+    }
+
+    // ── Summary ─────────────────────────────────────────────
+    results.innerHTML += `<h2>Summary</h2>`;
+    results.innerHTML += `<div class="result ${failed === 0 ? 'pass' : 'fail'}">${passed} passed, ${failed} failed</div>`;
+    document.title = `${failed === 0 ? '✓' : '✗'} ${passed}/${passed + failed} — cup-ui tests`;
+  </script>
+</body>
+</html>

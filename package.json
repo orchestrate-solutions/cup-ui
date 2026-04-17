@@ -1,0 +1,48 @@
+{
+  "name": "cup-ui",
+  "version": "0.1.0",
+  "description": "Framework-agnostic, a11y-first Web Component library. Drop a tag, it's there.",
+  "type": "module",
+  "main": "cup.js",
+  "exports": {
+    ".": "./cup.js",
+    "./cup.css": "./cup.css",
+    "./cup-element": "./cup-element.js",
+    "./components/*": "./components/*.js",
+    "./themes/*": "./themes/*.css",
+    "./css/*": "./css/*.css",
+    "./tokens.css": "./tokens.css",
+    "./reset.css": "./reset.css",
+    "./a11y.css": "./a11y.css"
+  },
+  "files": [
+    "cup.js",
+    "cup.css",
+    "cup-element.js",
+    "components/",
+    "css/",
+    "themes/",
+    "tokens.css",
+    "reset.css",
+    "a11y.css"
+  ],
+  "scripts": {
+    "test": "npx cypress run",
+    "test:open": "npx cypress open",
+    "test:component": "npx cypress run --spec 'cypress/component/**/*.cy.js'",
+    "test:e2e": "npx cypress run --spec 'cypress/e2e/**/*.cy.js'"
+  },
+  "keywords": [
+    "web-components",
+    "vanilla",
+    "css",
+    "a11y",
+    "design-system",
+    "light-dom"
+  ],
+  "author": "Orchestrate Solutions",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cypress": "^15.13.0"
+  }
+}
