@@ -4,12 +4,11 @@
 
 ## ⚠️ Read-Only Mirror
 
-This repository is **automatically synced** from the private
-[codeupipe](https://github.com/orchestrate-solutions/codeupipe) monorepo.
+This repository is **automatically synced** from a private source repo.
 **Do not open PRs or push directly** — changes will be overwritten on the
 next sync.
 
-To contribute, submit changes to the `cup-ui/` directory in the codeupipe repo.
+To report issues or request features, open an issue here.
 
 ---
 
@@ -66,7 +65,3 @@ Import individual layers or the full bundle via `cup.css`.
 ## License
 
 Apache-2.0 — See [LICENSE](LICENSE).
-
----
-
-*Auto-synced from codeupipe. Last sync triggered by CI.*

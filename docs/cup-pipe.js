@@ -1,6 +1,6 @@
-// cup-pipe.js — Browser-native codeupipe runtime.
+// cup-pipe.js — Browser-native pipeline runtime.
 // Payload → Filter → Pipeline → State → Hook → Tap → Valve.
-// 1:1 with ports/ts/src/* and codeupipe/core/*.py. Zero dependencies.
+// Zero dependencies.
 
 // ── Payload ───────────────────────────────────────────────────────
 // Immutable data container flowing through pipelines.

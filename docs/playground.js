@@ -1,6 +1,6 @@
 // playground.js — Pipeline orchestrator for the cup/core component playground.
 // Assembles Filters, builds a Pipeline, runs it with a Payload.
-// Dogfoods codeupipe patterns in the browser via cup-pipe.js (JS runtime).
+// Uses cup-pipe.js (JS runtime) for pipeline orchestration.
 // Loads the WASM runtime alongside for benchmarking and demonstration.
 
 import { Payload, Pipeline } from './cup-pipe.js';
@@ -162,7 +162,7 @@ class BuildFooter {
       const sha = commit === 'dev' ? 'dev' : commit;
       const dateStr = date ? ` · ${date}` : '';
       const href = sha !== 'dev'
-        ? `https://github.com/codeuchain/codeupipe/commit/${sha}`
+        ? `https://github.com/orchestrate-solutions/cup-ui/commit/${sha}`
         : null;
       el.innerHTML = href
         ? `cup/core · <a href="${href}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">${sha}</a>${dateStr}`
