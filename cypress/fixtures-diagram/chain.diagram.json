@@ -1,0 +1,8 @@
+{
+  "title": "Chain fixture",
+  "nodes": [
+    { "id": "a", "label": "Alpha" },
+    { "id": "b", "label": "Beta" }
+  ],
+  "edges": [{ "from": "a", "to": "b", "label": "then" }]
+}

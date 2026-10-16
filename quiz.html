@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cup quiz</title>
+  <link rel="stylesheet" href="./cup.css">
+  <script type="module" src="./cup.js"></script>
+  <style>
+    body { margin: 0; background: var(--cup-color-surface); color: var(--cup-color-on-surface);
+           font-family: var(--cup-font-family); line-height: var(--cup-line-height); }
+    main { max-width: 46rem; margin: 0 auto; padding: var(--cup-space-md); }
+    h1 { font-size: var(--cup-font-size-xl); margin: 0 0 var(--cup-space-xs); }
+    h2 { font-size: var(--cup-font-size-lg); margin: var(--cup-space-lg) 0 var(--cup-space-xs); }
+    .muted { color: var(--cup-color-secondary); }
+    .step { font-family: var(--cup-font-family-mono); font-size: var(--cup-font-size-xs);
+            text-transform: uppercase; letter-spacing: 0.06em; color: var(--cup-color-secondary); }
+    label { display: block; margin: var(--cup-space-lg) 0 var(--cup-space-xs); font-weight: var(--cup-font-weight-medium); }
+    textarea { width: 100%; min-height: 7rem; box-sizing: border-box; padding: var(--cup-space-sm);
+               font: inherit; color: inherit; background: var(--cup-color-surface-alt);
+               border: 1px solid var(--cup-color-border); border-radius: var(--cup-radius-sm); }
+    textarea:focus-visible { outline: 2px solid var(--cup-color-focus); outline-offset: 1px; }
+    button { margin-top: var(--cup-space-lg); min-height: var(--cup-touch-min); padding: 0 var(--cup-space-lg);
+             font: inherit; font-weight: var(--cup-font-weight-bold); cursor: pointer;
+             color: var(--cup-color-on-primary); background: var(--cup-color-primary);
+             border: none; border-radius: var(--cup-radius-sm); }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .frame { overflow-x: auto; margin: 0 calc(-1 * var(--cup-space-md)); border-top: 1px solid var(--cup-color-border);
+             border-bottom: 1px solid var(--cup-color-border); }
+    button.quiet { display: block; padding: 0; background: none; color: var(--cup-color-secondary);
+                   font-weight: var(--cup-font-weight-normal); text-decoration: underline; }
+    dt { margin-top: var(--cup-space-md); font-weight: var(--cup-font-weight-bold); }
+    dd { margin: 0; color: var(--cup-color-secondary); }
+    details { margin-top: var(--cup-space-lg); }
+    summary { cursor: pointer; min-height: var(--cup-touch-min); line-height: var(--cup-touch-min); }
+    .error { color: var(--cup-color-error); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <p class="step" id="step"></p>
+  <h1 id="title">Loading…</h1>
+  <p class="muted" id="lead"></p>
+
+  <form id="answers" hidden></form>
+  <div id="study" hidden></div>
+
+  <p class="error" id="error" role="alert"></p>
+  <button id="next" hidden>Next</button>
+  <button id="skip" class="quiet" hidden>I don't know any of this yet. Skip</button>
+</main>
+
+<script type="module">
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => {
+    const node = Object.assign(document.createElement(tag), props);
+    node.append(...children);
+    return node;
+  };
+  const src = new URLSearchParams(location.search).get('quiz');
+  const key = `cup-quiz:${src}`;
+  const load = () => { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } };
+  const save = (state) => { try { localStorage.setItem(key, JSON.stringify(state)); } catch { /* storage is optional */ } };
+
+  let quiz;
+  let sections;
+  let steps;
+  let state = { step: 0, baseline: null, before: {}, after: {}, started: new Date().toISOString(), ...load() };
+
+  function showQuestions(phase, questions) {
+    const form = $('answers');
+    form.replaceChildren();
+    for (const question of questions) {
+      const box = el('textarea', { id: `q-${question.id}`, value: state[phase][question.id] || '' });
+      box.addEventListener('input', () => { state[phase][question.id] = box.value; save(state); });
+      form.append(el('label', { htmlFor: box.id, textContent: question.q }), box);
+    }
+    form.hidden = false;
+  }
+
+  function termList() {
+    const list = el('dl');
+    for (const { term, meaning } of quiz.terms || []) {
+      list.append(el('dt', { textContent: term }), el('dd', { textContent: meaning }));
+    }
+    return list;
+  }
+
+  function showTerms() {
+    $('study').replaceChildren(termList());
+    $('study').hidden = false;
+  }
+
+  function showDiagrams(paths) {
+    const study = $('study');
+    study.replaceChildren();
+    for (const path of paths) {
+      const heading = el('h2', { textContent: '…' });
+      const takeaway = el('p', { className: 'muted' });
+      const source = el('p', { className: 'step' });
+      const graph = el('cup-graph');
+      graph.setAttribute('readonly', '');
+      graph.addEventListener('cup-graph-load', (e) => {
+        heading.textContent = e.detail.document.title || 'Diagram';
+        takeaway.textContent = e.detail.document.takeaway || '';
+        if (e.detail.document.source) source.textContent = `Source: ${e.detail.document.source}`;
+        graph.setAttribute('aria-label', heading.textContent);
+      });
+      graph.addEventListener('cup-graph-error', (e) => { heading.textContent = `Could not load: ${e.detail.message}`; });
+      graph.setAttribute('src', path);
+      study.append(heading, takeaway, el('div', { className: 'frame' }, graph), source);
+    }
+    if ((quiz.terms || []).length) {
+      study.append(el('details', {}, el('summary', { textContent: 'Terms' }), termList()));
+    }
+    study.hidden = false;
+  }
+
+  async function submit() {
+    const response = await fetch('/answers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quiz: (src || 'quiz').split('/').pop().replace('.quiz.json', ''),
+        started: state.started,
+        finished: new Date().toISOString(),
+        baseline: state.baseline,
+        before: state.before,
+        after: state.after,
+      }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  }
+
+  function render() {
+    const step = steps[state.step];
+    const next = $('next');
+    const skip = $('skip');
+    $('answers').hidden = true;
+    $('study').hidden = true;
+    $('error').textContent = '';
+    next.hidden = false;
+    next.disabled = false;
+    skip.hidden = true;
+    window.scrollTo(0, 0);
+    $('step').textContent = step.kind === 'done' ? 'Done' : `Step ${state.step + 1} of ${steps.length - 1}`;
+
+    if (step.kind === 'before') {
+      $('lead').textContent = quiz.intro || '';
+      showQuestions('before', sections.flatMap((s) => s.questions));
+      next.textContent = 'Next';
+      skip.hidden = false;
+    } else if (step.kind === 'terms') {
+      $('lead').textContent = 'The words used in the diagrams. You can open this list again at any time.';
+      showTerms();
+      next.textContent = 'Show me the first diagram';
+    } else if (step.kind === 'study') {
+      $('lead').textContent = `Diagram ${step.index + 1} of ${sections.length}. Take as long as you like. It is hidden while you answer.`;
+      showDiagrams(step.section.diagrams);
+      next.textContent = "I'm ready to answer";
+    } else if (step.kind === 'answer') {
+      $('lead').textContent = 'From what you now understand. Your own words are fine.';
+      showQuestions('after', step.section.questions);
+      next.textContent = step.last ? 'Submit answers' : 'Next diagram';
+    } else {
+      $('lead').textContent = 'Your answers are saved. Tell Claude you have finished.';
+      next.hidden = true;
+    }
+  }
+
+  async function advance() {
+    const step = steps[state.step];
+    if (step.kind === 'before' && !state.baseline) {
+      const any = Object.values(state.before).some((v) => v && v.trim());
+      state.baseline = any ? 'answered' : 'left blank';
+    }
+    if (step.kind === 'answer' && step.last) {
+      $('next').disabled = true;
+      try {
+        await submit();
+      } catch (error) {
+        $('error').textContent = `Could not save (${error.message}). Your answers are still on this page; try again.`;
+        $('next').disabled = false;
+        return;
+      }
+    }
+    state.step += 1;
+    save(state);
+    render();
+  }
+
+  $('next').addEventListener('click', advance);
+  $('skip').addEventListener('click', () => { state.baseline = 'skipped'; state.before = {}; advance(); });
+
+  try {
+    if (!src) throw new Error('add ?quiz=/path/to/file.quiz.json to the address');
+    const response = await fetch(src);
+    if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`);
+    quiz = await response.json();
+    sections = (quiz.sections || [{ diagrams: quiz.diagrams || [], questions: quiz.questions || [] }])
+      .map((s) => ({ diagrams: s.diagrams || [s.diagram], questions: s.questions || [] }));
+    steps = [{ kind: 'before' }];
+    if ((quiz.terms || []).length) steps.push({ kind: 'terms' });
+    sections.forEach((section, index) => {
+      steps.push({ kind: 'study', section, index });
+      steps.push({ kind: 'answer', section, index, last: index === sections.length - 1 });
+    });
+    steps.push({ kind: 'done' });
+    if (state.step >= steps.length) state.step = 0;
+    $('title').textContent = quiz.title || 'Quiz';
+    document.title = $('title').textContent;
+    render();
+  } catch (error) {
+    $('title').textContent = 'Could not load the quiz';
+    $('error').textContent = error.message;
+  }
+</script>
+</body>
+</html>

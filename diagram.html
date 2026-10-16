@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cup diagram</title>
+  <link rel="stylesheet" href="./cup.css">
+  <script type="module" src="./cup.js"></script>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+           background: var(--cup-color-surface); color: var(--cup-color-on-surface);
+           font-family: var(--cup-font-family); }
+    header { padding: var(--cup-space-md) var(--cup-space-lg); border-bottom: 1px solid var(--cup-color-border); }
+    h1 { margin: 0; font-size: var(--cup-font-size-lg); }
+    #takeaway { margin: var(--cup-space-xs) 0 0; max-width: 70ch; color: var(--cup-color-secondary); }
+    #problems { margin: var(--cup-space-sm) 0 0; padding-left: var(--cup-space-md);
+                color: var(--cup-color-error); font-family: var(--cup-font-family-mono);
+                font-size: var(--cup-font-size-xs); }
+    #problems:empty { display: none; }
+    main { flex: 1; overflow: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="title">cup diagram</h1>
+    <p id="takeaway">Add ?spec=/path/to/file.diagram.json to the address.</p>
+    <ul id="problems" aria-label="Problems with this diagram"></ul>
+  </header>
+  <main><cup-graph id="graph"></cup-graph></main>
+  <script type="module">
+    const graph = document.getElementById('graph');
+    const title = document.getElementById('title');
+    const takeaway = document.getElementById('takeaway');
+    const problems = document.getElementById('problems');
+    const report = (lines) => {
+      problems.replaceChildren(...lines.map((line) => Object.assign(document.createElement('li'), { textContent: line })));
+    };
+
+    graph.addEventListener('cup-graph-load', (e) => {
+      const doc = e.detail.document;
+      title.textContent = doc.title || 'Untitled diagram';
+      document.title = title.textContent;
+      takeaway.textContent = [doc.takeaway, doc.source && `Source: ${doc.source}`].filter(Boolean).join(' ');
+      graph.setAttribute('aria-label', title.textContent);
+      report(graph.problems);
+    });
+    graph.addEventListener('cup-graph-error', (e) => {
+      title.textContent = 'Could not load the diagram';
+      takeaway.textContent = '';
+      report([e.detail.message]);
+    });
+
+    const spec = new URLSearchParams(location.search).get('spec');
+    if (spec) graph.setAttribute('src', spec);
+  </script>
+</body>
+</html>

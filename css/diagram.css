@@ -1,0 +1,205 @@
+/* cup-ui/css/diagram.css — Diagram components: cup-node, cup-edge */
+
+@layer cup-component {
+
+  /* ── Node ── */
+  cup-node {
+    display: inline-block;
+  }
+
+  .cup-node {
+    min-width: 11rem;
+    max-width: 16rem;
+    padding: var(--cup-space-sm) var(--cup-space-md);
+    background-color: var(--cup-color-surface);
+    color: var(--cup-color-on-surface);
+    border: 1.5px solid var(--cup-color-on-surface);
+    transition: border-color var(--cup-transition-fast),
+                background-color var(--cup-transition-fast),
+                box-shadow var(--cup-transition-fast),
+                opacity var(--cup-transition-fast);
+  }
+
+  .cup-node--rect { border-radius: 0; }
+
+  /* A fixed radius, not a full one: a tall pill would curve into its own text. */
+  .cup-node--pill {
+    border-radius: 1.5rem;
+    padding: var(--cup-space-sm) var(--cup-space-lg);
+    text-align: center;
+  }
+
+  .cup-node--diamond {
+    border-radius: 2px;
+    border-left-width: 6px;
+    background-color: var(--cup-color-surface-alt);
+  }
+
+  .cup-node--cylinder {
+    border-radius: 3px;
+    border-top: 3px double var(--cup-color-on-surface);
+    border-bottom: 3px double var(--cup-color-on-surface);
+    background-color: var(--cup-color-surface-alt);
+  }
+
+  /* Focus is a ring (form). Cause and effect are an orange/blue pair, which
+     survives color-vision deficiency, and each also carries a text cue. */
+  .cup-node--focused {
+    border-color: var(--cup-color-primary);
+    box-shadow: 0 0 0 3px var(--cup-color-focus);
+  }
+
+  .cup-node--upstream {
+    border-color: var(--cup-color-warning);
+    background-color: color-mix(in srgb, var(--cup-color-warning) 12%, var(--cup-color-surface));
+  }
+
+  .cup-node--downstream {
+    border-color: var(--cup-color-info);
+    background-color: color-mix(in srgb, var(--cup-color-info) 12%, var(--cup-color-surface));
+  }
+
+  .cup-node--dimmed {
+    opacity: 0.25;
+    filter: grayscale(100%);
+  }
+
+  .cup-node___meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--cup-space-sm);
+    margin-bottom: var(--cup-space-xs);
+    padding-bottom: var(--cup-space-2xs);
+    border-bottom: 1px solid var(--cup-color-border);
+    font-family: var(--cup-font-family-mono);
+    font-size: var(--cup-font-size-xs);
+    color: var(--cup-color-secondary);
+  }
+
+  .cup-node___id { font-weight: var(--cup-font-weight-bold); }
+
+  .cup-node___role { text-transform: uppercase; }
+
+  .cup-node___flow {
+    margin-right: auto;
+    font-weight: var(--cup-font-weight-bold);
+    color: var(--cup-color-on-surface);
+  }
+
+  /* An unverified claim looks provisional: dashed outline, not just a color. */
+  .cup-node--claimed { border-style: dashed; }
+  .cup-node--failed { border-color: var(--cup-color-error); }
+
+  .cup-node___status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cup-space-xs);
+    margin-top: var(--cup-space-xs);
+    font-family: var(--cup-font-family-mono);
+    font-size: var(--cup-font-size-xs);
+    color: var(--cup-color-secondary);
+  }
+
+  .cup-node___status-tag { font-weight: var(--cup-font-weight-bold); }
+  .cup-node___status--verified .cup-node___status-tag { color: var(--cup-color-success); }
+  .cup-node___status--failed .cup-node___status-tag { color: var(--cup-color-error); }
+
+  .cup-node___label {
+    font-size: var(--cup-font-size-sm);
+    font-weight: var(--cup-font-weight-medium);
+    line-height: var(--cup-line-height-tight);
+  }
+
+  .cup-node___why {
+    margin: var(--cup-space-xs) 0 0;
+    padding-left: var(--cup-space-sm);
+    border-left: 2px solid var(--cup-color-border);
+    font-size: var(--cup-font-size-xs);
+    line-height: var(--cup-line-height-tight);
+    color: var(--cup-color-secondary);
+  }
+
+  .cup-node--pill .cup-node___why {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  /* Fixed track width: the same value draws the same length in every node. */
+  .cup-node cup-progress {
+    display: block;
+    width: 9rem;
+    margin-top: var(--cup-space-sm);
+    padding-top: var(--cup-space-xs);
+    border-top: 1px dashed var(--cup-color-border);
+  }
+
+  /* ── Edge ── */
+  cup-edge {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  cup-edge[hidden] { display: none; }
+
+  /* ── Graph ── */
+  cup-graph {
+    display: block;
+    position: relative;
+  }
+
+  cup-graph > cup-node {
+    position: absolute;
+    z-index: 1;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+  }
+
+  cup-graph[readonly] > cup-node { cursor: pointer; }
+  cup-graph > cup-node.cup-graph___dragging { cursor: grabbing; z-index: 2; }
+
+  cup-graph > cup-node:focus-visible {
+    outline: 2px solid var(--cup-color-focus);
+    outline-offset: 3px;
+  }
+
+  .cup-edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .cup-edge___path {
+    fill: none;
+    stroke: var(--cup-color-secondary);
+    stroke-width: 1.5;
+    transition: stroke var(--cup-transition-fast);
+  }
+
+  .cup-edge___path--active {
+    stroke: var(--cup-color-primary);
+    stroke-width: 2.2;
+  }
+
+  .cup-edge___arrow { fill: var(--cup-color-secondary); }
+
+  .cup-edge___label-box {
+    fill: var(--cup-color-surface);
+    stroke: var(--cup-color-border);
+    stroke-width: 1;
+  }
+
+  .cup-edge___label-text {
+    fill: var(--cup-color-secondary);
+    font-family: var(--cup-font-family-mono);
+    font-size: 10px;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+}

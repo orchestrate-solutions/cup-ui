@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARC Suite — Organism Observatory</title>
+  <meta name="description" content="Build, spawn, and observe ARC organisms in real-time. Manage cognitive pipelines, research runners, browser agents, and sentinels.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+  <link rel="stylesheet" href="/cup.css">
+  <script type="module" src="/cup.js"></script>
+  <link rel="stylesheet" href="/arc-dashboard.css">
+</head>
+<body>
+
+  <div class="cup-shell">
+    <a href="#main" class="cup-skip-link">Skip to content</a>
+
+    <!-- ── Header ── -->
+    <header class="cup-shell___header">
+      <button class="cup-shell___menu-btn" id="menu-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="arc-header-title">
+        <strong class="arc-logo">ARC</strong>
+        <span class="arc-subtitle">Suite</span>
+      </div>
+      <div class="arc-header-status" id="api-status">
+        <span class="arc-status-dot arc-status-dot--checking"></span>
+        <span id="api-status-text">Connecting…</span>
+      </div>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:var(--cup-space-md);">
+        <cup-toggle label="Light" id="theme-toggle"></cup-toggle>
+      </div>
+    </header>
+
+    <!-- ── Sidebar Nav ── -->
+    <aside class="cup-shell___sidebar" id="sidebar">
+      <nav>
+        <h3 class="arc-nav-heading">Organisms</h3>
+        <a href="#queue" class="arc-nav-link arc-nav-link--active" data-panel="queue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Task Queue
+        </a>
+        <a href="#sessions" class="arc-nav-link" data-panel="sessions">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Session History
+        </a>
+
+        <h3 class="arc-nav-heading">Live View</h3>
+        <a href="#active" class="arc-nav-link" data-panel="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Living Organisms
+          <span class="arc-nav-badge" id="active-count" style="display:none">0</span>
+        </a>
+        <a href="#timeline" class="arc-nav-link" data-panel="timeline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          Timeline
+        </a>
+
+        <h3 class="arc-nav-heading">Actions</h3>
+        <a href="#builder" class="arc-nav-link" data-panel="builder">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Organism Builder
+        </a>
+        <a href="#create" class="arc-nav-link" data-panel="create">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Quick Task
+        </a>
+      </nav>
+
+      <!-- Queue stats in sidebar -->
+      <div class="arc-sidebar-stats" id="sidebar-stats">
+        <div class="arc-stat">
+          <span class="arc-stat-value" id="stat-ready">–</span>
+          <span class="arc-stat-label">Ready</span>
+        </div>
+        <div class="arc-stat">
+          <span class="arc-stat-value" id="stat-running">–</span>
+          <span class="arc-stat-label">Running</span>
+        </div>
+        <div class="arc-stat">
+          <span class="arc-stat-value" id="stat-done">–</span>
+          <span class="arc-stat-label">Done</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="cup-shell___main" id="main">
+      <h1 class="cup-sr-only">ARC Suite — Organism Observatory</h1>
+
+      <!-- ── Queue Panel ── -->
+      <section class="arc-panel arc-panel--active" id="panel-queue">
+        <div class="arc-panel-header">
+          <h2 class="arc-panel-title">Task Queue</h2>
+          <button class="cup-button cup-button--sm cup-button--secondary" id="refresh-queue">
+            Refresh
+          </button>
+        </div>
+
+        <div class="arc-queue-lanes" id="queue-lanes">
+          <!-- Ready lane -->
+          <div class="arc-lane">
+            <h3 class="arc-lane-title arc-lane-title--ready">
+              <span class="arc-lane-dot arc-lane-dot--ready"></span>
+              Ready
+              <span class="arc-lane-count" id="lane-ready-count">0</span>
+            </h3>
+            <div class="arc-lane-items" id="lane-ready"></div>
+          </div>
+
+          <!-- Claimed lane -->
+          <div class="arc-lane">
+            <h3 class="arc-lane-title arc-lane-title--claimed">
+              <span class="arc-lane-dot arc-lane-dot--claimed"></span>
+              Running
+              <span class="arc-lane-count" id="lane-claimed-count">0</span>
+            </h3>
+            <div class="arc-lane-items" id="lane-claimed"></div>
+          </div>
+
+          <!-- Done lane -->
+          <div class="arc-lane">
+            <h3 class="arc-lane-title arc-lane-title--done">
+              <span class="arc-lane-dot arc-lane-dot--done"></span>
+              Completed
+              <span class="arc-lane-count" id="lane-done-count">0</span>
+            </h3>
+            <div class="arc-lane-items" id="lane-done"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Sessions Panel ── -->
+      <section class="arc-panel" id="panel-sessions">
+        <div class="arc-panel-header">
+          <h2 class="arc-panel-title">Session History</h2>
+          <button class="cup-button cup-button--sm cup-button--secondary" id="refresh-sessions">
+            Refresh
+          </button>
+        </div>
+        <div class="arc-sessions-grid" id="sessions-grid">
+          <p class="arc-empty">Loading sessions…</p>
+        </div>
+      </section>
+
+      <!-- ── Living Organisms Panel ── -->
+      <section class="arc-panel" id="panel-active">
+        <div class="arc-panel-header">
+          <h2 class="arc-panel-title">Living Organisms</h2>
+          <button class="cup-btn cup-btn--sm" id="refresh-active" title="Refresh">↻</button>
+        </div>
+        <div id="active-view">
+          <p class="arc-empty arc-empty--watching">
+            <span class="arc-pulse-ring"></span>
+            Watching for organism activity…
+          </p>
+        </div>
+      </section>
+
+      <!-- ── Timeline Panel ── -->
+      <section class="arc-panel" id="panel-timeline">
+        <div class="arc-panel-header">
+          <h2 class="arc-panel-title">Session Timeline</h2>
+          <select class="cup-input arc-session-select" id="timeline-session-select">
+            <option value="">Select a session…</option>
+          </select>
+        </div>
+        <div class="arc-timeline" id="timeline-view">
+          <p class="arc-empty">Select a session to view its lifecycle.</p>
+        </div>
+      </section>
+
+      <!-- ── Organism Builder Panel ── -->
+      <section class="arc-panel" id="panel-builder">
+        <div class="arc-panel-header">
+          <h2 class="arc-panel-title">Organism Builder</h2>
+          <span class="arc-builder-hint">Choose a type. Drag parts onto the organism. Spawn it.</span>
+        </div>
+
+        <!-- Type selector (SPORE creature picker) -->
+        <div class="arc-type-selector" id="type-selector"></div>
+
+        <div class="arc-builder-layout">
+          <!-- Left: SVG organism preview with drop zones -->
+          <div class="arc-builder-preview">
+            <div class="arc-canvas-wrapper" id="canvas-wrapper">
+              <svg id="organism-svg" viewBox="0 0 400 520" class="arc-organism-svg" aria-label="Organism shape preview">
+                <defs>
+                  <radialGradient id="body-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="var(--organism-color, var(--cup-color-primary))" stop-opacity="0.15"/>
+                    <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+                  </radialGradient>
+                  <filter id="glow-filter">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                <ellipse cx="200" cy="260" rx="150" ry="200" fill="url(#body-glow)"/>
+                <g id="svg-sensors" class="arc-svg-layer" transform="translate(200, 60)"></g>
+                <g id="svg-core" class="arc-svg-layer" transform="translate(200, 260)"></g>
+                <g id="svg-limbs" class="arc-svg-layer" transform="translate(200, 340)"></g>
+                <g id="svg-hooks" class="arc-svg-layer" transform="translate(200, 260)"></g>
+                <g id="svg-connections" class="arc-svg-layer"></g>
+              </svg>
+              <!-- Drop zones rendered by JS -->
+              <div class="arc-drop-zone" data-zone="sensors" id="zone-sensors">
+                <span class="arc-drop-zone-label">👁 Sensors</span>
+              </div>
+              <div class="arc-drop-zone" data-zone="core" id="zone-core">
+                <span class="arc-drop-zone-label">🧠 Core</span>
+              </div>
+              <div class="arc-drop-zone" data-zone="limbs" id="zone-limbs">
+                <span class="arc-drop-zone-label">🦾 Limbs</span>
+              </div>
+              <div class="arc-drop-zone" data-zone="hooks" id="zone-hooks">
+                <span class="arc-drop-zone-label">💓 Hooks</span>
+              </div>
+            </div>
+            <div class="arc-builder-name" id="organism-name-display">Research Organism</div>
+          </div>
+
+          <!-- Right: Part selectors -->
+          <div class="arc-builder-controls">
+            <fieldset class="arc-part-group">
+              <legend class="arc-part-legend">
+                <span class="arc-part-icon">👁</span> Sensors
+                <span class="arc-part-sublabel">Perception</span>
+              </legend>
+              <div class="arc-part-grid" id="sensor-parts"></div>
+            </fieldset>
+
+            <fieldset class="arc-part-group">
+              <legend class="arc-part-legend">
+                <span class="arc-part-icon">🧠</span> Cognitive Core
+                <span class="arc-part-sublabel">Brain layers</span>
+              </legend>
+              <div class="arc-part-grid" id="core-parts"></div>
+            </fieldset>
+
+            <fieldset class="arc-part-group">
+              <legend class="arc-part-legend">
+                <span class="arc-part-icon">🦾</span> Limbs
+                <span class="arc-part-sublabel">Tool appendages</span>
+              </legend>
+              <div class="arc-part-grid" id="limb-parts"></div>
+            </fieldset>
+
+            <fieldset class="arc-part-group">
+              <legend class="arc-part-legend">
+                <span class="arc-part-icon">💓</span> Hooks
+                <span class="arc-part-sublabel">Observers</span>
+              </legend>
+              <div class="arc-part-grid" id="hook-parts"></div>
+            </fieldset>
+
+            <fieldset class="arc-part-group">
+              <legend class="arc-part-legend">
+                <span class="arc-part-icon">⚙</span> Configuration
+              </legend>
+              <div class="arc-builder-config">
+                <label class="arc-config-label" id="config-scale">
+                  Scale
+                  <select id="builder-scale" class="cup-input">
+                    <option value="small">Small (3 models)</option>
+                    <option value="medium">Medium (5 models)</option>
+                  </select>
+                </label>
+                <label class="arc-config-label" id="config-timeout">
+                  Timeout (s)
+                  <input type="number" id="builder-timeout" class="cup-input" value="120" min="10" max="3600">
+                </label>
+                <label class="arc-config-label" id="config-gate" style="display:none">
+                  Gate threshold
+                  <input type="number" id="builder-gate" class="cup-input" value="0.2" min="0" max="1" step="0.05">
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="arc-builder-actions">
+              <button class="cup-button cup-button--primary arc-spawn-btn" id="spawn-organism" type="button">
+                <span class="arc-spawn-icon">⚡</span> Spawn Organism
+              </button>
+              <span class="arc-spawn-status" id="spawn-status"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Create Task Panel ── -->
+      <section class="arc-panel" id="panel-create">
+        <div class="arc-panel-header">
+          <h2 class="arc-panel-title">Create Research Task</h2>
+        </div>
+        <form class="arc-create-form" id="create-form">
+          <cup-field label="Task Title" required>
+            <input type="text" id="task-title" class="cup-input" placeholder="Research: Do embedding models preserve domain boundaries?" required>
+          </cup-field>
+
+          <cup-field label="Scale">
+            <select id="task-scale" class="cup-input">
+              <option value="small">Small (3 models)</option>
+              <option value="medium">Medium (5 models)</option>
+            </select>
+          </cup-field>
+
+          <cup-field label="Concepts" hint="Comma-separated concept list">
+            <input type="text" id="task-concepts" class="cup-input" placeholder="love, justice, compiler, harmony, king, queen">
+          </cup-field>
+
+          <cup-field label="Timeout (seconds)">
+            <input type="number" id="task-timeout" class="cup-input" value="120" min="30" max="600">
+          </cup-field>
+
+          <div class="arc-form-actions">
+            <button type="submit" class="cup-button cup-button--primary">
+              Create Task
+            </button>
+            <span class="arc-form-status" id="create-status"></span>
+          </div>
+        </form>
+      </section>
+
+      <!-- ── Session Detail Modal ── -->
+      <section class="arc-panel" id="panel-detail" style="display:none;">
+        <div class="arc-panel-header">
+          <button class="cup-button cup-button--sm cup-button--secondary" id="detail-back">
+            ← Back
+          </button>
+          <h2 class="arc-panel-title" id="detail-title">Session Detail</h2>
+        </div>
+        <div id="detail-view"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="/arc-dashboard.js"></script>
+</body>
+</html>

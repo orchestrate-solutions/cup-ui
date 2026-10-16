@@ -48,6 +48,9 @@ npm install github:orchestrate-solutions/cup-ui
 | `<cup-radio-group>` | Radio button group |
 | `<cup-badge>` | Status badge |
 | `<cup-chip>` | Removable chip/tag |
+| `<cup-calendar>` | Time-grid calendar shell for schedules and planners |
+| `<cup-calendar-row>` | Calendar resource/person row with click-ready slot cells |
+| `<cup-calendar-block>` | Positioned event or blocker pill for calendar grids |
 | `<cup-divider>` | Visual separator |
 | `<cup-skeleton>` | Loading placeholder |
 | `<cup-stepper>` | Step indicator |

@@ -27,12 +27,24 @@ import './components/cup-date.js';
 import './components/cup-toggle.js';
 import './components/cup-badge.js';
 import './components/cup-chip.js';
+import './components/cup-calendar.js';
+import './components/cup-calendar-toolbar.js';
+import './components/cup-calendar-row.js';
+import './components/cup-calendar-block.js';
+import './components/cup-calendar-event.js';
 
 // Component (organism)
 import './components/cup-toast.js';
 import './components/cup-stepper.js';
 import './components/cup-progress.js';
 import './components/cup-canvas.js';
+import './components/cup-agent-chat.js';
+import './components/cup-markdown.js';
+
+// Diagram components
+import './components/cup-node.js';
+import './components/cup-edge.js';
+import './components/cup-graph.js';
 
 // Re-export base
 export { CupElement, CssState } from './cup-element.js';

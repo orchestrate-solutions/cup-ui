@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cup-calendar — Component Demo</title>
+  <link rel="stylesheet" href="../cup.css">
+  <script type="module" src="../cup.js"></script>
+  <link rel="stylesheet" href="playground.css">
+  <style>
+    /* ── Demo page chrome ── */
+    .demo-header {
+      padding: var(--cup-space-lg) var(--cup-space-xl);
+      border-bottom: 1px solid var(--cup-color-border);
+      background: var(--cup-color-surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: var(--cup-space-md);
+    }
+    .demo-header h1 {
+      font-size: var(--cup-font-size-lg);
+      font-weight: var(--cup-font-weight-bold);
+      margin: 0;
+    }
+    .demo-header a {
+      margin-left: auto;
+      font-size: var(--cup-font-size-sm);
+      color: var(--cup-color-secondary);
+      text-decoration: none;
+    }
+    .demo-header a:hover { color: var(--cup-color-primary); }
+
+    .demo-body {
+      display: flex;
+      gap: 0;
+    }
+
+    /* ── Sidebar ── */
+    .demo-sidebar {
+      width: 200px;
+      min-width: 200px;
+      border-right: 1px solid var(--cup-color-border);
+      padding: var(--cup-space-lg) var(--cup-space-md);
+      position: sticky;
+      top: 57px;
+      height: calc(100vh - 57px);
+      overflow-y: auto;
+    }
+    .demo-sidebar h3 {
+      font-size: var(--cup-font-size-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cup-color-secondary);
+      margin: var(--cup-space-lg) 0 var(--cup-space-xs);
+    }
+    .demo-sidebar h3:first-child { margin-top: 0; }
+    .demo-nav-link {
+      display: block;
+      padding: var(--cup-space-xs) var(--cup-space-sm);
+      font-size: var(--cup-font-size-sm);
+      color: var(--cup-color-on-surface);
+      text-decoration: none;
+      border-radius: var(--cup-radius-sm);
+    }
+    .demo-nav-link:hover { background: var(--cup-color-surface-alt); }
+    .demo-nav-link.active { background: var(--cup-color-surface-alt); color: var(--cup-color-primary); }
+
+    /* ── Main content ── */
+    .demo-main {
+      flex: 1;
+      min-width: 0;
+      padding: var(--cup-space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--cup-space-xxl, 48px);
+    }
+
+    /* ── Section ── */
+    .demo-section { display: flex; flex-direction: column; gap: var(--cup-space-lg); }
+    .demo-section-title {
+      font-size: var(--cup-font-size-lg);
+      font-weight: var(--cup-font-weight-bold);
+      border-bottom: 1px solid var(--cup-color-border);
+      padding-bottom: var(--cup-space-sm);
+    }
+    .demo-section-desc {
+      font-size: var(--cup-font-size-sm);
+      color: var(--cup-color-secondary);
+      margin-top: calc(-1 * var(--cup-space-sm));
+    }
+
+    /* ── Calendar frame ── */
+    .demo-cal-wrap {
+      border: 1px solid var(--cup-color-border);
+      border-radius: var(--cup-radius-md);
+      overflow: hidden;
+      background: var(--cup-color-surface);
+    }
+    .demo-cal-tall  { height: 560px; }
+    .demo-cal-short { height: 320px; }
+
+    /* ── Controls row ── */
+    .demo-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--cup-space-sm);
+      align-items: center;
+    }
+    .demo-controls label {
+      display: flex;
+      align-items: center;
+      gap: var(--cup-space-xs);
+      font-size: var(--cup-font-size-sm);
+      color: var(--cup-color-secondary);
+    }
+    .demo-controls select,
+    .demo-controls input[type=range] {
+      background: var(--cup-color-surface-alt);
+      border: 1px solid var(--cup-color-border);
+      border-radius: var(--cup-radius-sm);
+      color: var(--cup-color-on-surface);
+      padding: 2px 6px;
+      font-size: var(--cup-font-size-sm);
+    }
+    .demo-btn {
+      padding: var(--cup-space-xs) var(--cup-space-md);
+      background: var(--cup-color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--cup-radius-sm);
+      font-size: var(--cup-font-size-sm);
+      cursor: pointer;
+    }
+    .demo-btn:hover { opacity: 0.85; }
+    .demo-btn.secondary {
+      background: var(--cup-color-surface-alt);
+      color: var(--cup-color-on-surface);
+      border: 1px solid var(--cup-color-border);
+    }
+
+    /* ── Log ── */
+    .demo-log {
+      font-family: monospace;
+      font-size: 12px;
+      background: var(--cup-color-surface-alt);
+      border: 1px solid var(--cup-color-border);
+      border-radius: var(--cup-radius-sm);
+      padding: var(--cup-space-sm) var(--cup-space-md);
+      min-height: 40px;
+      max-height: 80px;
+      overflow-y: auto;
+      color: var(--cup-color-secondary);
+    }
+
+    /* ── Event pill showcase host ── */
+    .demo-pill-host {
+      position: relative;
+      height: 56px;
+      border-radius: var(--cup-radius-sm);
+      overflow: hidden;
+    }
+    .demo-pill-host cup-calendar-event {
+      position: absolute;
+      inset: 2px;
+    }
+
+    /* ── Section card look ── */
+    .demo-section {
+      background: var(--cup-color-surface);
+      border: 1px solid var(--cup-color-border);
+      border-radius: var(--cup-radius-lg, 12px);
+      padding: var(--cup-space-xl);
+      gap: var(--cup-space-md);
+    }
+    .demo-section-title {
+      font-size: var(--cup-font-size-md, 1rem);
+      font-weight: var(--cup-font-weight-bold);
+      border-bottom: 1px solid var(--cup-color-border);
+      padding-bottom: var(--cup-space-sm);
+      margin-bottom: 0;
+    }
+
+    /* ── details/summary arrow style ── */
+    details > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: var(--cup-space-xs) 0;
+    }
+    details > summary::before {
+      content: '▶ ';
+      font-size: 10px;
+    }
+    details[open] > summary::before {
+      content: '▼ ';
+    }
+
+    /* ── API table zebra ── */
+    #api-table tr:nth-child(even) {
+      background: var(--cup-color-surface-alt);
+    }
+
+    /* ── Body background ── */
+    body { background: color-mix(in srgb, var(--cup-color-surface) 60%, #000); }
+      background: #0d0d0d;
+      border: 1px solid var(--cup-color-border);
+      border-radius: var(--cup-radius-sm);
+      padding: var(--cup-space-md);
+      font-family: monospace;
+      font-size: 12px;
+      color: #a8d8a8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="demo-header">
+    <h1>cup-calendar</h1>
+    <span style="color:var(--cup-color-secondary);font-size:var(--cup-font-size-sm)">Component Demo</span>
+    <a href="index.html">← Back to Playground</a>
+  </header>
+
+  <div class="demo-body">
+
+    <!-- ── Sidebar ── -->
+    <aside class="demo-sidebar">
+      <h3>Views</h3>
+      <a href="#resource-timegrid"    class="demo-nav-link">Resource TimeGrid</a>
+      <a href="#resource-timeline"    class="demo-nav-link">Resource Timeline</a>
+      <a href="#timegrid-week"        class="demo-nav-link">TimeGrid Week</a>
+      <a href="#timegrid-day"         class="demo-nav-link">TimeGrid Day</a>
+      <a href="#month-grid"           class="demo-nav-link">Month Grid</a>
+      <a href="#year-grid"            class="demo-nav-link">Year Grid</a>
+      <a href="#timezones"            class="demo-nav-link">Timezones</a>
+      <a href="#timeline"             class="demo-nav-link">Timeline (Legacy)</a>
+      <h3>Chrome</h3>
+      <a href="#toolbar"           class="demo-nav-link">Toolbar</a>
+      <a href="#event-pill"        class="demo-nav-link">Event Pill</a>
+      <a href="#interaction"       class="demo-nav-link">Tooltip + Modal</a>
+      <a href="#contact-cards"     class="demo-nav-link">Contact Cards</a>
+      <h3>API</h3>
+      <a href="#programmatic"      class="demo-nav-link">Programmatic</a>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="demo-main">
+
+      <!-- ════════════════════════════════════════
+           1. RESOURCE TIMEGRID
+      ════════════════════════════════════════ -->
+      <section id="resource-timegrid" class="demo-section">
+        <div class="demo-section-title">Resource TimeGrid</div>
+        <p class="demo-section-desc">Vertical time axis with one column per resource — Google Calendar / Family Chaos style.</p>
+
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="addRandomEvent()">+ Add Event</button>
+          <button class="demo-btn secondary" onclick="clearRTG()">Clear Events</button>
+          <button class="demo-btn" id="rtg-edit-btn" onclick="toggleEdit('rtg')">✏ Edit mode</button>
+          <label>Slot size
+            <select id="rtg-slot" onchange="setRTGSlot(this.value)">
+              <option value="00:15:00">15 min</option>
+              <option value="00:30:00">30 min</option>
+              <option value="01:00:00">1 hour</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="demo-cal-wrap demo-cal-tall">
+          <cup-calendar id="cal-rtg"></cup-calendar>
+        </div>
+
+        <div class="demo-log" id="rtg-log">click a slot or event to see callback output…</div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">const cal = document.querySelector('#cal-rtg');
+
+cal.setResources([
+  { id: 'alice', title: 'Alice' },
+  { id: 'bob',   title: 'Bob'   },
+  { id: 'carol', title: 'Carol' },
+]);
+
+cal.setOption('view',         'resourceTimeGrid');
+cal.setOption('slotMinTime',  '07:00');
+cal.setOption('slotMaxTime',  '19:00');
+cal.setOption('slotDuration', '00:15:00');
+
+cal.addEvent({
+  id: 'e1', title: 'Standup', resourceId: 'alice',
+  startMins: 540, durationMins: 30, kind: 'event',
+});
+
+cal.setOption('dateClick', (info) => {
+  console.log('clicked', info.resourceId, 'at', info.mins, 'mins');
+});</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           1b. RESOURCE TIMELINE
+      ════════════════════════════════════════ -->
+      <section id="resource-timeline" class="demo-section">
+        <div class="demo-section-title">Resource Timeline</div>
+        <p class="demo-section-desc">Horizontal time axis with one row per resource — FullCalendar resourceTimeline style. Resources scroll vertically, time scrolls horizontally.</p>
+
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="addRTLEvent()">+ Add Event</button>
+          <button class="demo-btn secondary" onclick="clearRTL()">Clear Events</button>
+          <button class="demo-btn" id="rtl-edit-btn" onclick="toggleEdit('rtl')">✏ Edit mode</button>
+          <label>Hour width
+            <select id="rtl-hour-w" onchange="setRTLHourW(Number(this.value))">
+              <option value="48">48 px/hr</option>
+              <option value="60" selected>60 px/hr</option>
+              <option value="90">90 px/hr</option>
+              <option value="120">120 px/hr</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="demo-cal-wrap" style="height:320px">
+          <cup-calendar id="cal-rtl"></cup-calendar>
+        </div>
+
+        <div class="demo-log" id="rtl-log">click a lane or event to see callback output…</div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">const cal = document.querySelector('#cal-rtl');
+
+cal.setResources([
+  { id: 'alice', title: 'Alice' },
+  { id: 'bob',   title: 'Bob'   },
+]);
+
+cal.setOption('view',        'resourceTimeline');
+cal.setOption('slotMinTime', '07:00');
+cal.setOption('slotMaxTime', '20:00');
+cal.setOption('hourWidth',   60);   // px per hour
+
+cal.addEvent({ id:'e1', title:'Standup', resourceId:'alice', startMins:540, durationMins:30 });
+
+cal.setOption('eventClick',    info => console.log('clicked', info.event.title));
+cal.setOption('dateClick',     info => console.log('lane click', info.resourceId, info.mins, 'mins'));
+cal.setOption('resourceClick', info => console.log('resource', info.resourceId));</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           2. TIMEGRID WEEK
+      ════════════════════════════════════════ -->
+      <section id="timegrid-week" class="demo-section">
+        <div class="demo-section-title">TimeGrid Week</div>
+        <p class="demo-section-desc">7-day vertical view, one column per day. Uses today's week by default.</p>
+
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="tgwPrev()">← Prev</button>
+          <button class="demo-btn" onclick="tgwToday()">Today</button>
+          <button class="demo-btn" onclick="tgwNext()">Next →</button>
+        </div>
+
+        <div class="demo-cal-wrap demo-cal-tall">
+          <cup-calendar id="cal-tgw"></cup-calendar>
+        </div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">const cal = document.querySelector('#cal-tgw');
+cal.setOption('view', 'timeGridWeek');
+cal.addEvent({ id:'w1', title:'Team sync', start:'2024-01-15T09:00', end:'2024-01-15T10:00' });
+cal.prev();   // go back one week
+cal.next();   // go forward one week
+cal.today();  // jump to current week</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3. TIMEGRID DAY
+      ════════════════════════════════════════ -->
+      <section id="timegrid-day" class="demo-section">
+        <div class="demo-section-title">TimeGrid Day</div>
+        <p class="demo-section-desc">Single-day vertical view — same engine as Week but scoped to one day.</p>
+
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="tgdPrev()">← Prev</button>
+          <button class="demo-btn" onclick="tgdToday()">Today</button>
+          <button class="demo-btn" onclick="tgdNext()">Next →</button>
+        </div>
+
+        <div class="demo-cal-wrap demo-cal-tall">
+          <cup-calendar id="cal-tgd"></cup-calendar>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3b. MONTH GRID
+      ════════════════════════════════════════ -->
+      <section id="month-grid" class="demo-section">
+        <div class="demo-section-title">Month Grid</div>
+        <p class="demo-section-desc">Classic month calendar — 6-week grid with event pills and overflow count.</p>
+
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="mgPrev()">← Prev</button>
+          <button class="demo-btn" onclick="mgToday()">Today</button>
+          <button class="demo-btn" onclick="mgNext()">Next →</button>
+          <button class="demo-btn" onclick="addMGEvent()">+ Add event</button>
+        </div>
+
+        <div class="demo-cal-wrap demo-cal-tall">
+          <cup-calendar id="cal-mg"></cup-calendar>
+        </div>
+        <div class="demo-log" id="mg-log">click events appear here…</div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">cal.setOption('view', 'monthGrid');
+cal.addEvent({ id:'m1', title:'Sprint review', start:'2026-06-10T14:00', end:'2026-06-10T15:00', tone:'easy' });
+cal.prev();    // previous month
+cal.next();    // next month
+cal.today();   // jump to current month</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3c. YEAR GRID
+      ════════════════════════════════════════ -->
+      <section id="year-grid" class="demo-section">
+        <div class="demo-section-title">Year Grid</div>
+        <p class="demo-section-desc">12-month overview — days tinted by event density. Click a day to fire dateClick.</p>
+
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="ygPrev()">← Prev year</button>
+          <button class="demo-btn" onclick="ygToday()">This year</button>
+          <button class="demo-btn" onclick="ygNext()">Next year →</button>
+        </div>
+
+        <div class="demo-cal-wrap" style="height:500px">
+          <cup-calendar id="cal-yg"></cup-calendar>
+        </div>
+        <div class="demo-log" id="yg-log">click events appear here…</div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3d. TIMEZONES
+      ════════════════════════════════════════ -->
+      <section id="timezones" class="demo-section">
+        <div class="demo-section-title">Timezones</div>
+        <p class="demo-section-desc">
+          Display events in a different timezone. Set <code>homeTimeZone</code> to show a secondary clock in the gutter
+          — useful when you work in one timezone but live in another.
+        </p>
+
+        <div class="demo-controls">
+          <label style="font-size:var(--cup-font-size-sm);color:var(--cup-color-secondary)">Display TZ:</label>
+          <select class="demo-btn" id="tz-display-select" onchange="setTZDisplay(this.value)" style="cursor:pointer">
+            <option value="">Browser local</option>
+            <option value="America/New_York">America/New_York (EST/EDT)</option>
+            <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+            <option value="America/Denver">America/Denver (MST/MDT)</option>
+            <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+            <option value="America/Anchorage">America/Anchorage (AKST)</option>
+            <option value="Pacific/Honolulu">Pacific/Honolulu (HST)</option>
+            <option value="Europe/London">Europe/London (GMT/BST)</option>
+            <option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+            <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+            <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+            <option value="Australia/Sydney">Australia/Sydney (AEST/AEDT)</option>
+          </select>
+
+          <label style="font-size:var(--cup-font-size-sm);color:var(--cup-color-secondary);margin-left:var(--cup-space-sm)">Home TZ:</label>
+          <select class="demo-btn" id="tz-home-select" onchange="setTZHome(this.value)" style="cursor:pointer">
+            <option value="">None</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Europe/Paris">Europe/Paris</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+            <option value="Asia/Kolkata">Asia/Kolkata</option>
+            <option value="Australia/Sydney">Australia/Sydney</option>
+          </select>
+
+          <button class="demo-btn" onclick="tzPrev()">← Prev</button>
+          <button class="demo-btn" onclick="tzToday()">Today</button>
+          <button class="demo-btn" onclick="tzNext()">Next →</button>
+          <button class="demo-btn" id="tz-edit-btn" onclick="toggleEdit('tz')">✏ Edit mode</button>
+        </div>
+
+        <div class="demo-cal-wrap demo-cal-tall">
+          <cup-calendar id="cal-tz"></cup-calendar>
+        </div>
+        <div class="demo-log" id="tz-log">interactions appear here…</div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">// Display all times in Tokyo — even if your browser is in New York
+cal.setOption('timeZone', 'Asia/Tokyo');
+
+// Show a secondary clock in the gutter (your home city's time)
+cal.setOption('homeTimeZone', 'America/New_York');
+
+// Events need full ISO datetime strings (UTC moments) to be TZ-aware
+cal.addEvent({
+  id: 'tz1',
+  title: 'Tokyo standup',
+  start: '2026-06-16T00:00:00Z',  // midnight UTC = 9am JST
+  end:   '2026-06-16T00:30:00Z',
+  tone: 'easy',
+});</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           4. TIMELINE (LEGACY)
+      ════════════════════════════════════════ -->
+      <section id="timeline" class="demo-section">
+        <div class="demo-section-title">Timeline (Legacy horizontal)</div>
+        <p class="demo-section-desc">Horizontal resource rows — kept for backward compat. Powers the original Family Chaos build.</p>
+
+        <div class="demo-cal-wrap demo-cal-short">
+          <cup-calendar id="cal-tl"></cup-calendar>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           5. TOOLBAR
+      ════════════════════════════════════════ -->
+      <section id="toolbar" class="demo-section">
+        <div class="demo-section-title">cup-calendar-toolbar</div>
+        <p class="demo-section-desc">Standalone nav + view switcher. Fires <code>cup-nav</code> and <code>cup-view</code> events.</p>
+
+        <div style="padding: var(--cup-space-md); border: 1px solid var(--cup-color-border); border-radius: var(--cup-radius-md); background: var(--cup-color-surface);">
+          <cup-calendar-toolbar
+            id="demo-toolbar"
+            title="June 2026"
+            view="resourceTimeGrid"
+            views="resourceTimeGrid,timeGridWeek,timeGridDay,monthGrid,yearGrid">
+          </cup-calendar-toolbar>
+        </div>
+
+        <div class="demo-log" id="toolbar-log">toolbar events appear here…</div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">&lt;cup-calendar-toolbar
+  title="June 2026"
+  view="resourceTimeGrid"
+  views="resourceTimeGrid,timeGridWeek,timeGridDay,monthGrid,yearGrid"
+&gt;&lt;/cup-calendar-toolbar&gt;
+
+toolbar.addEventListener('cup-nav',  e => console.log(e.detail)); // {action:'prev'|'next'|'today'}
+toolbar.addEventListener('cup-view', e => console.log(e.detail)); // {view:'...'}</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           6. EVENT PILL
+      ════════════════════════════════════════ -->
+      <section id="event-pill" class="demo-section">
+        <div class="demo-section-title">cup-calendar-event</div>
+        <p class="demo-section-desc">
+          Standalone event pill — kinds, tones, and states. Pills are self-aware:
+          they broadcast their own identity and live spatial state during drag,
+          and float in viewport space so they slide cleanly across column boundaries.
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,200px);gap:var(--cup-space-md);padding:var(--cup-space-lg);border:1px solid var(--cup-color-border);border-radius:var(--cup-radius-md);background:var(--cup-color-surface);">
+          <div class="demo-pill-host"><cup-calendar-event label="kind=event"    kind="event"                          ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="kind=blocker"  kind="blocker"                        ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="tone=easy"     kind="event"  tone="easy"             ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="tone=normal"   kind="event"  tone="normal"           ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="tone=hard"     kind="event"  tone="hard"             ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="state=ok"      kind="event"  state="ok"              ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="state=conflict"kind="event"  state="conflict"        ></cup-calendar-event></div>
+          <div class="demo-pill-host"><cup-calendar-event label="draggable"     kind="event"  draggable               ></cup-calendar-event></div>
+        </div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Pill event contract</summary>
+          <div class="demo-code">&lt;cup-calendar-event
+  label="Standup"
+  kind="event" tone="normal" state="ok"
+  data-event-id="e1"
+  data-start-mins="540"
+  data-duration-mins="30"
+  data-resource-id="alice"
+  draggable&gt;&lt;/cup-calendar-event&gt;
+
+// At pickup the pill announces itself with full identity + spatial state:
+el.addEventListener('cup-event-pickup', e =&gt; {
+  // e.detail = { eventId, startMins, durationMins, resourceId, date,
+  //              pickupOffsetX, pickupOffsetY, pickupFracX, pickupFracY,
+  //              originRect: { left, top, width, height } }
+});
+
+// During drag the pill emits its live rect (viewport coords, since the pill
+// is lifted to position:fixed so it can slide across column separators):
+el.addEventListener('cup-event-dragmove', e =&gt; {
+  // e.detail = { eventId, clientX, clientY, pickupOffsetX, pickupOffsetY,
+  //              pickupFracX, pickupFracY,
+  //              originRect, currentRect, deltaX, deltaY }
+});
+
+el.addEventListener('cup-event-dragend', e =&gt; { /* same shape as dragmove */ });
+el.addEventListener('cup-event-resize',  e =&gt; { /* { eventId, newHeightPx|newWidthPx, originSize } */ });</div>
+        </details>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           6b. INTERACTION — DEFAULT TOOLTIP + MODAL
+      ════════════════════════════════════════ -->
+      <section id="interaction" class="demo-section">
+        <div class="demo-section-title">Default interactions</div>
+        <p class="demo-section-desc">
+          Every <code>&lt;cup-calendar&gt;</code> ships with a default hover tooltip and click modal —
+          consistent across every view (resourceTimeGrid, resourceTimeline, timeGridDay/Week, monthGrid, timezones).
+          Both layer on top of any user-supplied <code>eventClick</code> callback;
+          they don't replace it.
+        </p>
+
+        <div style="padding:var(--cup-space-lg);border:1px solid var(--cup-color-border);border-radius:var(--cup-radius-md);background:var(--cup-color-surface);display:grid;gap:var(--cup-space-md);">
+          <div><strong>Hover</strong> — wait ~300 ms over any event to see a tooltip card with title, start, end, and resource.</div>
+          <div><strong>Click</strong> — opens a modal with full event details. Click outside or press Escape to dismiss.</div>
+          <div><strong>Drag</strong> — pills float in viewport space (position:fixed) so they slide cleanly over column separators with a soft elevation shadow.</div>
+        </div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Opt-out / configure</summary>
+          <div class="demo-code">// Default: both on, 300 ms hover delay
+cal.setOption('showTooltips',   true);   // false to disable
+cal.setOption('showEventModal', true);   // false to disable
+cal.setOption('tooltipDelayMs', 300);    // hover delay before tooltip appears
+
+// User callbacks still fire — they run alongside the default modal:
+cal.setOption('eventClick', info =&gt; { /* your custom logic */ });</div>
+        </details>
+      </section>
+
+
+      <!-- ════════════════════════════════════════
+           6c. CONTACT CARD TOOLTIPS
+      ════════════════════════════════════════ -->
+      <section id="contact-cards" class="demo-section">
+        <div class="demo-section-title">Contact Card Tooltips</div>
+        <p class="demo-section-desc">
+          Wire <code>resourceTooltip</code> to transform every resource label hover into a rich
+          contact card — name, avatar, role, department, local time, email, phone, and event load.
+          Hover any person row below. The card positions itself to the right of the sticky label column.
+        </p>
+
+        <style>
+          /* ── Contact card chrome ── */
+          .cc-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-width: 260px;
+            max-width: 300px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--cup-color-on-surface);
+          }
+          .cc-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 14px 10px;
+          }
+          .cc-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            object-fit: cover;
+          }
+          .cc-avatar-initials {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+          }
+          .cc-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--cup-color-on-surface);
+            line-height: 1.2;
+          }
+          .cc-role {
+            font-size: 11px;
+            color: var(--cup-color-secondary);
+            margin-top: 1px;
+          }
+          .cc-status-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+          }
+          .cc-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+          }
+          .cc-status-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+          }
+          .cc-body {
+            border-top: 1px solid rgba(255,255,255,.07);
+            padding: 8px 14px 4px;
+            display: grid;
+            gap: 5px;
+          }
+          .cc-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+          }
+          .cc-icon { flex-shrink: 0; width: 14px; text-align: center; opacity: .7; }
+          .cc-text { color: var(--cup-color-secondary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .cc-link { color: var(--cup-color-primary); text-decoration: none; }
+          .cc-link:hover { text-decoration: underline; }
+          .cc-footer {
+            border-top: 1px solid rgba(255,255,255,.07);
+            padding: 7px 14px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .cc-event-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          .cc-event-dots {
+            display: flex;
+            gap: 3px;
+          }
+          .cc-event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--cup-color-primary);
+            opacity: .35;
+          }
+          .cc-event-dot--filled { opacity: 1; }
+          .cc-event-count {
+            font-size: 10px;
+            color: var(--cup-color-secondary);
+          }
+          .cc-open-btn {
+            font-size: 10px;
+            color: var(--cup-color-primary);
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            opacity: .7;
+          }
+          .cc-open-btn:hover { opacity: 1; }
+          /* ── Standalone card preview grid ── */
+          .cc-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
+            gap: var(--cup-space-md);
+          }
+          .cc-preview-wrap {
+            background: var(--cup-color-surface-alt);
+            border: 1px solid var(--cup-color-border);
+            border-radius: var(--cup-radius-md);
+            overflow: hidden;
+          }
+          /* Reuse .cup-cal-tooltip styles but without the positioning */
+          .cc-preview-wrap .cc-card {
+            font-family: var(--cup-font-family, system-ui, sans-serif);
+          }
+        </style>
+
+        <!-- Calendar with contact tooltips -->
+        <div class="demo-cal-wrap" style="height:280px">
+          <cup-calendar id="cal-contacts"></cup-calendar>
+        </div>
+
+        <!-- Standalone card preview -->
+        <div>
+          <div style="font-size:var(--cup-font-size-sm);font-weight:600;color:var(--cup-color-secondary);margin-bottom:var(--cup-space-sm)">Card preview — what hover shows</div>
+          <div class="cc-preview-grid" id="cc-preview-grid"></div>
+        </div>
+
+        <details>
+          <summary style="font-size:var(--cup-font-size-sm);cursor:pointer;color:var(--cup-color-secondary)">Show code</summary>
+          <div class="demo-code">// Rich contact data on each resource
+const CONTACTS = [
+  { id: 'alice', title: 'Alice Chen',      role: 'Product Designer',   dept: 'Design',
+    tz: 'America/Los_Angeles', email: 'alice@company.com',  phone: '+1 415-555-0101',
+    status: 'available',  avatarColor: '#7c3aed' },
+  ...
+];
+
+cal.setResources(CONTACTS);
+
+// resourceTooltip: fn({ resource, resourceId }) → HTML string
+cal.setOption('resourceTooltip', ({ resource }) => {
+  const initials = resource.title.split(' ').map(w => w[0]).join('').slice(0,2);
+  const statusColors = { available: '#22c55e', busy: '#f59e0b', dnd: '#ef4444', offline: '#6b7280' };
+  const localTime = new Intl.DateTimeFormat('en', {
+    timeZone: resource.tz, hour: 'numeric', minute: '2-digit',
+  }).format(new Date());
+  return buildContactCard({ resource, initials, statusColors, localTime });
+});</div>
+        </details>
+      </section>
+
+
+      <!-- ════════════════════════════════════════
+           7. PROGRAMMATIC API
+      ════════════════════════════════════════ -->
+      <section id="programmatic" class="demo-section">
+        <div class="demo-section-title">Programmatic API Reference</div>
+        <p class="demo-section-desc">All public methods on <code>&lt;cup-calendar&gt;</code>.</p>
+
+        <table style="width:100%;border-collapse:collapse;font-size:var(--cup-font-size-sm)">
+          <thead>
+            <tr style="border-bottom:2px solid var(--cup-color-border);text-align:left;color:var(--cup-color-secondary)">
+              <th style="padding:8px 12px">Method / Prop</th>
+              <th style="padding:8px 12px">Signature</th>
+              <th style="padding:8px 12px">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="api-table">
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+// ── Wait for custom elements to upgrade before touching the API ───────────────
+customElements.whenDefined('cup-calendar').then(init);
+
+function init() {
+
+// ── Seed data ─────────────────────────────────────────────────────────────────
+const RESOURCES = [
+  { id: 'alice', title: 'Alice' },
+  { id: 'bob',   title: 'Bob'   },
+  { id: 'carol', title: 'Carol' },
+  { id: 'dan',   title: 'Dan'   },
+];
+
+const BASE_EVENTS = [
+  { id:'e1', title:'Standup',    resourceId:'alice', startMins: 9*60,      durationMins:30,  kind:'event',   tone:'normal' },
+  { id:'e2', title:'Design sync',resourceId:'bob',   startMins:10*60,      durationMins:60,  kind:'event',   tone:'easy'   },
+  { id:'e3', title:'Lunch',      resourceId:'carol', startMins:12*60,      durationMins:60,  kind:'event',   tone:'normal' },
+  { id:'e4', title:'Blocked',    resourceId:'dan',   startMins:14*60,      durationMins:90,  kind:'blocker'  },
+  { id:'e5', title:'Code review',resourceId:'alice', startMins:15*60,      durationMins:45,  kind:'event',   tone:'hard'   },
+  { id:'e6', title:'1:1',        resourceId:'bob',   startMins:16*60,      durationMins:30,  kind:'event',   state:'ok'    },
+];
+
+// ── Resource TimeGrid ─────────────────────────────────────────────────────────
+const rtg = document.getElementById('cal-rtg');
+rtg.style.height = '100%';
+
+rtg.setResources(RESOURCES);
+rtg.setOption('view', 'resourceTimeGrid');
+rtg.setOption('slotMinTime', '07:00');
+rtg.setOption('slotMaxTime', '19:00');
+rtg.setOption('slotDuration', '00:15:00');
+rtg.setOption('editable', true);
+
+BASE_EVENTS.forEach(e => rtg.addEvent(e));
+
+rtg.setOption('dateClick', info => {
+  const h = Math.floor(info.mins/60), m = info.mins%60;
+  log('rtg-log', `dateClick → resource="${info.resourceId}"  time=${h}:${String(m).padStart(2,'0')}`);
+});
+rtg.setOption('resourceClick', info => {
+  log('rtg-log', `resourceClick → resource="${info.resourceId}"`);
+});
+rtg.setOption('eventClick', info => {
+  log('rtg-log', `eventClick → event="${info.event.title}" (${info.event.id})`);
+});
+rtg.setOption('eventDrop', info => {
+  const fmt = m => `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+  log('rtg-log', `eventDrop → "${info.event.title}" ${fmt(info.oldStart)}→${fmt(info.newStart)}  res:${info.oldResourceId}→${info.newResourceId}`);
+});
+rtg.setOption('eventResize', info => {
+  log('rtg-log', `eventResize → "${info.event.title}" ${info.oldDuration}→${info.newDuration}min`);
+});
+
+let _evCount = BASE_EVENTS.length;
+const NAMES  = ['Retro','Deploy','Sprint','Meeting','Review','Planning','Sync','Demo'];
+const TONES  = ['easy','normal','hard'];
+
+window.addRandomEvent = function() {
+  const res   = RESOURCES[Math.floor(Math.random() * RESOURCES.length)];
+  const start = 8*60 + Math.floor(Math.random() * 9) * 60;
+  const dur   = [30,45,60][Math.floor(Math.random()*3)];
+  const name  = NAMES[Math.floor(Math.random()*NAMES.length)];
+  _evCount++;
+  rtg.addEvent({
+    id: 'new-'+_evCount, title: name, resourceId: res.id,
+    startMins: start, durationMins: dur,
+    kind: 'event', tone: TONES[Math.floor(Math.random()*TONES.length)],
+  });
+  log('rtg-log', `addEvent → "${name}" on ${res.title} at ${Math.floor(start/60)}:00`);
+};
+
+window.clearRTG = function() { rtg.clearEvents(); log('rtg-log', 'clearEvents()'); };
+
+window.setRTGSlot = function(val) {
+  rtg.setOption('slotDuration', val);
+  log('rtg-log', `setOption('slotDuration', '${val}')`);
+};
+
+// ── Edit/View mode toggle — shared across RTG, RTL, TZ calendars ──────────────
+const _editCals = { rtg, rtl: null, tz: null };  // rtl/tz filled below
+function _syncEditBtn(key, editable) {
+  const btn = document.getElementById(`${key}-edit-btn`);
+  if (!btn) return;
+  btn.textContent = editable ? '👁 View mode' : '✏ Edit mode';
+  btn.style.background = editable
+    ? 'color-mix(in srgb, var(--cup-color-primary) 18%, transparent)'
+    : '';
+  btn.style.color  = editable ? 'var(--cup-color-primary)' : '';
+  btn.style.border = editable ? '1px solid var(--cup-color-primary)' : '';
+}
+window.toggleEdit = function(key) {
+  const cal = _editCals[key];
+  if (!cal) return;
+  const nowEditable = cal.toggleEditable();
+  _syncEditBtn(key, nowEditable);
+  log(`${key}-log`, `editable → ${nowEditable}`);
+};
+// Sync initial button states (RTG starts editable, others start read-only)
+_syncEditBtn('rtg', rtg.getOption('editable'));
+
+// ── Resource Timeline ─────────────────────────────────────────────────────────
+const rtl = document.getElementById('cal-rtl');
+rtl.style.height = '100%';
+
+rtl.setResources(RESOURCES);
+rtl.setOption('view',        'resourceTimeline');
+rtl.setOption('slotMinTime', '07:00');
+rtl.setOption('slotMaxTime', '20:00');
+rtl.setOption('editable',    true);
+
+// Same event shape as RTG (tone + kind) so pills look identical
+const RTL_EVENTS = [
+  { id:'r1', title:'Standup',     resourceId:'alice', startMins: 9*60,    durationMins:30,  kind:'event',   tone:'normal' },
+  { id:'r2', title:'Design Sync', resourceId:'bob',   startMins:10*60,    durationMins:60,  kind:'event',   tone:'easy'   },
+  { id:'r3', title:'Lunch',       resourceId:'carol', startMins:12*60,    durationMins:60,  kind:'event',   tone:'normal' },
+  { id:'r4', title:'Blocked',     resourceId:'dan',   startMins:14*60,    durationMins:90,  kind:'blocker'  },
+  { id:'r5', title:'Code Review', resourceId:'alice', startMins:15*60,    durationMins:45,  kind:'event',   tone:'hard'   },
+  { id:'r6', title:'1:1',         resourceId:'bob',   startMins:16*60+30, durationMins:30,  kind:'event',   state:'ok'    },
+];
+RTL_EVENTS.forEach(e => rtl.addEvent(e));
+
+rtl.setOption('eventClick', info => {
+  log('rtl-log', `eventClick → "${info.event.title}" (${info.event.id})`);
+});
+rtl.setOption('dateClick', info => {
+  const h = Math.floor(info.mins / 60), m = info.mins % 60;
+  log('rtl-log', `dateClick → resource="${info.resourceId}"  time=${h}:${String(m).padStart(2,'0')}`);
+});
+rtl.setOption('resourceClick', info => {
+  log('rtl-log', `resourceClick → resource="${info.resourceId}"`);
+});
+rtl.setOption('eventDrop', info => {
+  const fmt = m => `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+  log('rtl-log', `eventDrop → "${info.event.title}" ${fmt(info.oldStart)}→${fmt(info.newStart)}  res:${info.oldResourceId}→${info.newResourceId}`);
+});
+rtl.setOption('eventResize', info => {
+  log('rtl-log', `eventResize → "${info.event.title}" ${info.oldDuration}→${info.newDuration}min`);
+});
+
+let _rtlCount = RTL_EVENTS.length;
+window.addRTLEvent = function() {
+  const res   = RESOURCES[Math.floor(Math.random() * RESOURCES.length)];
+  const start = 8*60 + Math.floor(Math.random() * 10) * 60;
+  const dur   = [30, 45, 60, 90][Math.floor(Math.random() * 4)];
+  const name  = NAMES[Math.floor(Math.random() * NAMES.length)];
+  const tone  = TONES[Math.floor(Math.random() * TONES.length)];
+  _rtlCount++;
+  rtl.addEvent({
+    id: 'rtl-'+_rtlCount, title: name, resourceId: res.id,
+    startMins: start, durationMins: dur, kind: 'event', tone,
+  });
+  log('rtl-log', `addEvent → "${name}" on ${res.title} at ${Math.floor(start/60)}:00`);
+};
+
+window.clearRTL    = function() { rtl.clearEvents(); log('rtl-log', 'clearEvents()'); };
+window.setRTLHourW = function(val) {
+  rtl.setOption('hourWidth', val);
+  log('rtl-log', `setOption('hourWidth', ${val})`);
+};
+
+// Wire RTL into shared edit toggle registry
+_editCals.rtl = rtl;
+_syncEditBtn('rtl', rtl.getOption('editable'));
+
+// ── TimeGrid Week ─────────────────────────────────────────────────────────────
+const tgw = document.getElementById('cal-tgw');
+tgw.style.height = '100%';
+tgw.setOption('view', 'timeGridWeek');
+tgw.setOption('slotMinTime', '07:00');
+tgw.setOption('slotMaxTime', '20:00');
+
+// Seed a few demo events across this week (ISO start/end format)
+(function seedTgwEvents() {
+  const today = new Date();
+  const day0  = new Date(today); day0.setDate(today.getDate() - today.getDay()); // Sunday
+  const iso = (offset, h, m) => {
+    const d = new Date(day0); d.setDate(day0.getDate() + offset); d.setHours(h, m, 0, 0);
+    return d.toISOString();
+  };
+  [
+    { id:'w1', title:'Standup',       start: iso(1,  9, 0),  end: iso(1,  9, 30), color:'#5e81f4' },
+    { id:'w2', title:'1:1 with Alice',start: iso(2, 11, 0),  end: iso(2, 12, 0),  color:'#0ea5e9' },
+    { id:'w3', title:'Design review', start: iso(3, 14, 0),  end: iso(3, 15, 30), color:'#8b5cf6' },
+    { id:'w4', title:'Focus block',   start: iso(4,  9, 0),  end: iso(4, 12, 0),  color:'#10b981' },
+    { id:'w5', title:'Friday demo',   start: iso(5, 16, 0),  end: iso(5, 17, 0),  color:'#f59e0b' },
+  ].forEach(ev => tgw.addEvent(ev));
+})();
+
+window.tgwPrev  = () => tgw.prev();
+window.tgwNext  = () => tgw.next();
+window.tgwToday = () => tgw.today();
+
+// ── TimeGrid Day ──────────────────────────────────────────────────────────────
+const tgd = document.getElementById('cal-tgd');
+tgd.style.height = '100%';
+tgd.setOption('view', 'timeGridDay');
+tgd.setOption('slotMinTime', '07:00');
+tgd.setOption('slotMaxTime', '20:00');
+
+// Seed a few demo events for today
+(function seedTgdEvents() {
+  const today = new Date();
+  const iso = (h, m) => {
+    const d = new Date(today); d.setHours(h, m, 0, 0); return d.toISOString();
+  };
+  [
+    { id:'d1', title:'Morning standup', start: iso( 9,  0), end: iso( 9, 30), color:'#5e81f4' },
+    { id:'d2', title:'Customer call',   start: iso(10,  0), end: iso(11,  0), color:'#0ea5e9' },
+    { id:'d3', title:'Deep work',       start: iso(13,  0), end: iso(15,  0), color:'#10b981' },
+    { id:'d4', title:'Code review',     start: iso(15, 30), end: iso(16, 30), color:'#8b5cf6' },
+  ].forEach(ev => tgd.addEvent(ev));
+})();
+
+window.tgdPrev  = () => tgd.prev();
+window.tgdNext  = () => tgd.next();
+window.tgdToday = () => tgd.today();
+
+// ── Month Grid ─────────────────────────────────────────────────────────────────
+const mg = document.getElementById('cal-mg');
+mg.style.height = '100%';
+mg.setOption('view', 'monthGrid');
+mg.setOption('slotMinTime', '07:00');
+mg.setOption('slotMaxTime', '20:00');
+
+// Seed with some events spread around today's month
+const today = new Date();
+const y = today.getFullYear(), m = today.getMonth() + 1;
+const pad = n => String(n).padStart(2, '0');
+[
+  { id:'mg1', title:'Sprint start',   start:`${y}-${pad(m)}-02T09:00`, end:`${y}-${pad(m)}-02T10:00`, tone:'easy'  },
+  { id:'mg2', title:'Design review',  start:`${y}-${pad(m)}-05T14:00`, end:`${y}-${pad(m)}-05T15:00`, tone:'normal'},
+  { id:'mg3', title:'Client call',    start:`${y}-${pad(m)}-08T11:00`, end:`${y}-${pad(m)}-08T12:00`, tone:'hard'  },
+  { id:'mg4', title:'Sprint review',  start:`${y}-${pad(m)}-15T14:00`, end:`${y}-${pad(m)}-15T16:00`, tone:'easy'  },
+  { id:'mg5', title:'Retro',          start:`${y}-${pad(m)}-15T16:00`, end:`${y}-${pad(m)}-15T17:00`, tone:'normal'},
+  { id:'mg6', title:'Planning',       start:`${y}-${pad(m)}-16T10:00`, end:`${y}-${pad(m)}-16T11:00`, tone:'normal'},
+  { id:'mg7', title:'On-call',        start:`${y}-${pad(m)}-20T00:00`, end:`${y}-${pad(m)}-20T23:00`, kind:'blocker'},
+  { id:'mg8', title:'Demo day',       start:`${y}-${pad(m)}-22T13:00`, end:`${y}-${pad(m)}-22T14:30`, tone:'easy'  },
+  { id:'mg9', title:'All-hands',      start:`${y}-${pad(m)}-25T10:00`, end:`${y}-${pad(m)}-25T11:00`, tone:'normal'},
+].forEach(e => mg.addEvent(e));
+
+mg.setOption('eventClick', info => log('mg-log', `eventClick → "${info.event.title}"`));
+mg.setOption('dateClick',  info => log('mg-log', `dateClick → ${info.date}`));
+
+let _mgCount = 9;
+window.mgPrev  = () => mg.prev();
+window.mgNext  = () => mg.next();
+window.mgToday = () => mg.today();
+window.addMGEvent = function() {
+  const day   = 1 + Math.floor(Math.random() * 28);
+  const hour  = 8 + Math.floor(Math.random() * 10);
+  const tones = TONES;
+  const name  = NAMES[Math.floor(Math.random() * NAMES.length)];
+  _mgCount++;
+  mg.addEvent({
+    id: 'mg-' + _mgCount, title: name,
+    start: `${y}-${pad(m)}-${pad(day)}T${pad(hour)}:00`,
+    end:   `${y}-${pad(m)}-${pad(day)}T${pad(hour + 1)}:00`,
+    tone: tones[Math.floor(Math.random() * tones.length)],
+  });
+  log('mg-log', `addEvent → "${name}" on ${pad(day)}`);
+};
+
+// ── Year Grid ─────────────────────────────────────────────────────────────────
+const yg = document.getElementById('cal-yg');
+yg.style.height = '100%';
+yg.setOption('view', 'yearGrid');
+
+// Spread events across the year for a good heat-map demo
+const yearEvs = [];
+for (let mo = 1; mo <= 12; mo++) {
+  const count = 2 + Math.floor(Math.random() * 8);
+  for (let i = 0; i < count; i++) {
+    const day  = 1 + Math.floor(Math.random() * 28);
+    const hour = 8 + Math.floor(Math.random() * 10);
+    yearEvs.push({ id: `yg-${mo}-${i}`, title: NAMES[Math.floor(Math.random() * NAMES.length)],
+      start: `${y}-${pad(mo)}-${pad(day)}T${pad(hour)}:00`, });
+  }
+}
+yg.setEvents(yearEvs);
+yg.setOption('dateClick', info => log('yg-log', `dateClick → ${info.date}`));
+
+window.ygPrev  = () => yg.prev();
+window.ygNext  = () => yg.next();
+window.ygToday = () => yg.today();
+
+// ── Timezone Demo ─────────────────────────────────────────────────────────────
+const tzCal = document.getElementById('cal-tz');
+tzCal.style.height = '100%';
+tzCal.setOption('view', 'timeGridWeek');
+tzCal.setOption('slotMinTime', '06:00');
+tzCal.setOption('slotMaxTime', '22:00');
+
+// Events as UTC moments — they will render at the correct wall-clock time in any TZ
+const tzNow = new Date();
+const tzBase = new Date(tzNow.getFullYear(), tzNow.getMonth(), tzNow.getDate());
+function tzISO(offsetHrs, durMins) {
+  const s = new Date(tzBase.getTime() + offsetHrs * 3600000);
+  const e = new Date(s.getTime() + durMins * 60000);
+  return { start: s.toISOString(), end: e.toISOString() };
+}
+[
+  { id:'tz1', title:'Tokyo standup',      ...tzISO(0,    30), tone:'easy'   },
+  { id:'tz2', title:'London sync',        ...tzISO(9,    45), tone:'normal' },
+  { id:'tz3', title:'NYC all-hands',      ...tzISO(14,   60), tone:'hard'   },
+  { id:'tz4', title:'LA design review',   ...tzISO(17,   60), tone:'normal' },
+  { id:'tz5', title:'Deep work',          ...tzISO(8,   180), kind:'blocker'},
+].forEach(e => tzCal.addEvent(e));
+
+tzCal.setOption('eventClick', info => log('tz-log', `eventClick → "${info.event.title}"`));
+
+window.setTZDisplay = function(tz) {
+  tzCal.setOption('timeZone', tz || null);
+  log('tz-log', `timeZone → ${tz || '(browser local)'}`);
+};
+window.setTZHome = function(tz) {
+  tzCal.setOption('homeTimeZone', tz || null);
+  log('tz-log', `homeTimeZone → ${tz || 'none'}`);
+};
+window.tzPrev  = () => tzCal.prev();
+window.tzNext  = () => tzCal.next();
+window.tzToday = () => tzCal.today();
+
+// Wire TZ calendar into shared edit toggle registry
+_editCals.tz = tzCal;
+_syncEditBtn('tz', tzCal.getOption('editable'));
+
+// ── Legacy Timeline ───────────────────────────────────────────────────────────
+const tl = document.getElementById('cal-tl');
+tl.style.height = '100%';
+tl.data = {
+  label: 'Legacy timeline demo',
+  nameWidth: 120,
+  slotWidth: 24,
+  rowHeight: 44,
+  slots: Array.from({length:32}, (_,i) => ({
+    index: i,
+    label: i % 4 === 0 ? `${7+Math.floor(i/4)}a` : '',
+    minor: i % 4 !== 0,
+  })),
+  rows: RESOURCES.map(r => ({ personId: r.id, label: r.title, canDrive: false })),
+};
+
+// ── Contact Cards ────────────────────────────────────────────────────────────
+const CONTACTS = [
+  { id:'alice', title:'Alice Chen',        role:'Product Designer',     dept:'Design',
+    tz:'America/Los_Angeles', email:'alice@company.com',   phone:'+1 415-555-0101',
+    status:'available',  avatarColor:'#7c3aed', events: 3 },
+  { id:'bob',   title:'Bob Martinez',      role:'Senior Engineer',      dept:'Engineering',
+    tz:'America/New_York',    email:'bob@company.com',     phone:'+1 212-555-0134',
+    status:'busy',       avatarColor:'#0ea5e9', events: 5 },
+  { id:'carol', title:'Carol Kim',         role:'Engineering Manager',  dept:'Engineering',
+    tz:'America/Chicago',     email:'carol@company.com',   phone:'+1 312-555-0178',
+    status:'available',  avatarColor:'#10b981', events: 2 },
+  { id:'dan',   title:'Dan Okonkwo',       role:'Data Scientist',       dept:'Analytics',
+    tz:'Europe/London',       email:'dan@company.com',     phone:'+44 20 7946 0958',
+    status:'dnd',        avatarColor:'#f59e0b', events: 4 },
+  { id:'eva',   title:'Eva Rossi',         role:'Marketing Lead',       dept:'Marketing',
+    tz:'Europe/Rome',         email:'eva@company.com',     phone:'+39 02 555 0192',
+    status:'available',  avatarColor:'#ec4899', events: 1 },
+];
+
+const CC_STATUS = {
+  available: { color: '#22c55e', label: 'Available' },
+  busy:      { color: '#f59e0b', label: 'Busy' },
+  dnd:       { color: '#ef4444', label: 'Do not disturb' },
+  offline:   { color: '#6b7280', label: 'Offline' },
+};
+
+function ccInitials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function ccLocalTime(tz) {
+  try {
+    return new Intl.DateTimeFormat('en', {
+      timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true,
+    }).format(new Date());
+  } catch { return ''; }
+}
+
+function ccLocalDay(tz) {
+  try {
+    const day = new Intl.DateTimeFormat('en', { timeZone: tz, weekday: 'short' }).format(new Date());
+    return day;
+  } catch { return ''; }
+}
+
+function buildContactCard(c) {
+  const st   = CC_STATUS[c.status] || CC_STATUS.offline;
+
+  // Tiny inline SVG avatar so it works fully offline
+  const initials = ccInitials(c.title);
+  const avatarSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="${c.avatarColor}"/><text x="24" y="30" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="white">${initials}</text></svg>`;
+  const avatarSrc = 'data:image/svg+xml;base64,' + btoa(avatarSvg);
+
+  const ltime = ccLocalTime(c.tz);
+  const lday  = ccLocalDay(c.tz);
+  const tzShort = c.tz ? c.tz.split('/').pop().replace(/_/g, '\u200b') : '';
+
+  return `<div class="cc-card">
+  <div class="cc-header">
+    <img class="cc-avatar" src="${avatarSrc}" alt="${initials}" width="48" height="48">
+    <div style="min-width:0">
+      <div class="cc-name">${c.title}</div>
+      <div class="cc-role">${c.role}</div>
+      <div class="cc-status-row">
+        <span class="cc-status-dot" style="background:${st.color}"></span>
+        <span class="cc-status-label" style="color:${st.color}">${st.label}</span>
+      </div>
+    </div>
+  </div>
+  <div class="cc-body">
+    <div class="cc-row"><span class="cc-icon">&#x1F3E2;</span><span class="cc-text">${c.dept}</span></div>
+    <div class="cc-row"><span class="cc-icon">&#x1F30D;</span><span class="cc-text">${tzShort} &mdash; <strong style="color:var(--cup-color-on-surface)">${lday} ${ltime}</strong></span></div>
+    <div class="cc-row"><span class="cc-icon">&#x2709;&#xFE0F;</span><a class="cc-link cc-text" href="mailto:${c.email}">${c.email}</a></div>
+    <div class="cc-row"><span class="cc-icon">&#x1F4DE;</span><span class="cc-text">${c.phone}</span></div>
+  </div>
+  <div class="cc-footer">
+    <button class="cc-open-btn">Open contact &#x2192;</button>
+  </div>
+</div>`;
+}
+
+const calContacts = document.getElementById('cal-contacts');
+calContacts.style.height = '100%';
+calContacts.setResources(CONTACTS);
+calContacts.setOption('view',        'resourceTimeline');
+calContacts.setOption('slotMinTime', '08:00');
+calContacts.setOption('slotMaxTime', '18:00');
+calContacts.setOption('hourWidth',   80);
+
+const CC_EVENTS = [
+  { id:'cc1', title:'Design review',   resourceId:'alice', startMins:  9*60,      durationMins:60,  kind:'event', tone:'normal' },
+  { id:'cc2', title:'Sprint planning', resourceId:'alice', startMins: 14*60,      durationMins:90,  kind:'event', tone:'hard'   },
+  { id:'cc3', title:'Standup',         resourceId:'alice', startMins: 16*60,      durationMins:30,  kind:'event', tone:'easy'   },
+  { id:'cc4', title:'Standup',         resourceId:'bob',   startMins:  9*60,      durationMins:30,  kind:'event', tone:'normal' },
+  { id:'cc5', title:'1:1 w/ Carol',    resourceId:'bob',   startMins: 11*60,      durationMins:45,  kind:'event', tone:'easy'   },
+  { id:'cc6', title:'Code review',     resourceId:'bob',   startMins: 13*60,      durationMins:60,  kind:'event', tone:'hard'   },
+  { id:'cc7', title:'Leadership sync', resourceId:'bob',   startMins: 15*60,      durationMins:60,  kind:'event', tone:'normal' },
+  { id:'cc8', title:'Deep work',       resourceId:'bob',   startMins: 16*60+30,   durationMins:60,  kind:'blocker' },
+  { id:'cc9', title:'Team sync',       resourceId:'carol', startMins: 10*60,      durationMins:60,  kind:'event', tone:'easy'   },
+  { id:'cc10',title:'1:1 w/ Bob',      resourceId:'carol', startMins: 11*60,      durationMins:45,  kind:'event', tone:'easy'   },
+  { id:'cc11',title:'Data demo',       resourceId:'dan',   startMins: 13*60,      durationMins:90,  kind:'event', tone:'normal' },
+  { id:'cc12',title:'OKR review',      resourceId:'dan',   startMins: 15*60,      durationMins:60,  kind:'event', tone:'hard'   },
+  { id:'cc13',title:'On-call',         resourceId:'dan',   startMins:  8*60,      durationMins:60,  kind:'blocker' },
+  { id:'cc14',title:'Campaign kick',   resourceId:'eva',   startMins: 10*60,      durationMins:60,  kind:'event', tone:'easy'   },
+  { id:'cc15',title:'Campaign review', resourceId:'eva',   startMins: 10*60,      durationMins:60,  kind:'event', tone:'easy'   },
+];
+CC_EVENTS.forEach(e => calContacts.addEvent(e));
+
+calContacts.setOption('resourceTooltip', ({ resourceId }) => {
+  const c = CONTACTS.find(x => x.id === resourceId);
+  return c ? buildContactCard(c) : null;
+});
+
+calContacts.setOption('resourceClick', ({ resourceId }) => {
+  log('rtg-log', `resourceClick (contacts) → "${resourceId}"`);
+});
+
+// Render standalone card previews
+(function renderContactPreviews() {
+  const grid = document.getElementById('cc-preview-grid');
+  if (!grid) return;
+  CONTACTS.forEach(c => {
+    const wrap = document.createElement('div');
+    wrap.className = 'cc-preview-wrap';
+    wrap.innerHTML = buildContactCard(c);
+    grid.appendChild(wrap);
+  });
+})();
+
+// ── Toolbar ───────────────────────────────────────────────────────────────────
+const demoToolbar = document.getElementById('demo-toolbar');
+demoToolbar.addEventListener('cup-nav',  e => log('toolbar-log', `cup-nav → action="${e.detail.action}"`));
+demoToolbar.addEventListener('cup-view', e => log('toolbar-log', `cup-view → view="${e.detail.view}"`));
+
+// ── API table ─────────────────────────────────────────────────────────────────
+const API = [
+  ['setOption(key, value)',       '(key: string, value: any)',        'Set any option; triggers re-render for view/slot options'],
+  ['getOption(key)',              '(key: string) → any',              'Read current option value'],
+  ['setResources(resources)',     '(resources: Resource[]) → void',   'Replace resource list; triggers re-render'],
+  ['getResources()',              '() → Resource[]',                  'Current resource list'],
+  ['addEvent(event)',             '(event: EventObj) → void',         'Append one event and re-render'],
+  ['setEvents(events)',           '(events: EventObj[]) → void',      'Batch replace all events'],
+  ['clearEvents()',               '() → void',                        'Remove all events and re-render'],
+  ['getEvents()',                 '() → EventObj[]',                  'Current event list'],
+  ['getEventById(id)',            '(id: string) → EventProxy',        'Returns proxy with .setProp(), .setExtendedProp(), .remove()'],
+  ['removeEvent(id)',             '(id: string) → void',              'Remove event by id'],
+  ['changeView(viewType)',        '(viewType: string) → void',        'Switch view; same as setOption("view", …)'],
+  ['prev()',                      '() → void',                        'Navigate backwards (week/day views)'],
+  ['next()',                      '() → void',                        'Navigate forward'],
+  ['today()',                     '() → void',                        'Jump to today'],
+  ['toggleEditable()',            '() → boolean',                     'Flip editable mode and re-render'],
+  ['.data = {...}',               'set data(legacy)',                  'Legacy slot-index API for horizontal timeline'],
+  ['Option: showTooltips',        'boolean (default true)',           'Show hover tooltip card on event pills'],
+  ['Option: showEventModal',      'boolean (default true)',           'Show default modal on event click'],
+  ['Option: tooltipDelayMs',      'number (default 300)',             'Hover delay before tooltip appears'],
+  ['Callback: dateClick',         '{ resourceId, mins, jsEvent, view }',         'Fired when an empty slot is clicked'],
+  ['Callback: resourceTooltip',  '({ resource, resourceId }) → string | null', 'Return HTML string to show as contact card on resource label hover; null/empty = no tooltip'],
+  ['Callback: resourceClick',     '{ resource, resourceId, jsEvent }',            'Fired when a resource column header is clicked'],
+  ['Callback: eventClick',        '{ event, el, jsEvent, view }',                 'Fired when an event pill is clicked (runs alongside default modal)'],
+  ['Callback: eventDrop',         '{ event, oldStart, newStart, oldResourceId, newResourceId, deltaMins, view }', 'Fired after drag-to-move completes'],
+  ['Callback: eventResize',       '{ event, oldDuration, newDuration, view }',    'Fired after drag-to-resize completes'],
+  ['Pill event: cup-event-pickup','{ eventId, startMins, durationMins, resourceId, date, pickupOffsetX/Y, pickupFracX/Y, originRect }', 'Pill announces identity + grab point on pointerdown'],
+  ['Pill event: cup-event-dragmove','{ ...pickup fields, clientX, clientY, currentRect, deltaX, deltaY }', 'Pill broadcasts live spatial state during drag'],
+  ['Pill event: cup-event-dragend',  '{ same as dragmove }',                       'Pill broadcasts final state on pointerup'],
+  ['Pill event: cup-event-resize', '{ eventId, newHeightPx | newWidthPx, originSize }', 'Pill broadcasts new size on resize pointerup'],
+];
+
+const tbody = document.getElementById('api-table');
+API.forEach(([method, sig, note]) => {
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--cup-color-border)';
+  tr.innerHTML = `
+    <td style="padding:8px 12px;font-family:monospace;font-size:12px;color:var(--cup-color-primary)">${method}</td>
+    <td style="padding:8px 12px;font-family:monospace;font-size:11px;color:#a8d8a8">${sig}</td>
+    <td style="padding:8px 12px;font-size:var(--cup-font-size-sm);color:var(--cup-color-secondary)">${note}</td>`;
+  tbody.appendChild(tr);
+});
+
+// ── Sidebar active link ───────────────────────────────────────────────────────
+const sections = document.querySelectorAll('.demo-section');
+const links    = document.querySelectorAll('.demo-nav-link');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+e.target.id));
+    }
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => io.observe(s));
+
+} // end init()
+
+// ── Utility ───────────────────────────────────────────────────────────────────
+function log(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const line = document.createElement('div');
+  line.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
+  el.insertBefore(line, el.firstChild);
+}
+</script>
+
+</body>
+</html>
