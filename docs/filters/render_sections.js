@@ -17,7 +17,10 @@ export class RenderSections {
     const sections = payload.get('sections');
     const main = payload.get('main');
 
-    main.innerHTML = '';
+    // Keep the page's own <h1> (visually hidden, but the page heading for SEO and screen readers).
+    for (const child of [...main.children]) {
+      if (child.tagName !== 'H1') child.remove();
+    }
     for (const s of sections) {
       const el = document.createElement('section');
       el.className = 'pg-section';

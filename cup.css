@@ -2,14 +2,16 @@
  * Includes all layers in correct cascade order.
  * Just add: <link rel="stylesheet" href="cup-ui/cup.css"> */
 
-@layer cup-reset, cup-tokens, cup-nano, cup-micro, cup-component, cup-motion, cup-theme, cup-override;
+/* Old layer names (cup-nano, cup-micro, cup-component) are kept as empty placeholders
+ * in the same order. Apps that write @layer cup-nano { } etc. keep their place. */
+@layer cup-reset, cup-tokens, cup-elements, cup-nano, cup-components, cup-micro, cup-patterns, cup-component, cup-motion, cup-theme, cup-override;
 
 @import './reset.css';
 @import './tokens.css';
 @import './a11y.css';
-@import './css/nano.css';
-@import './css/micro.css';
-@import './css/components.css';
+@import './css/layers/elements.css';
+@import './css/layers/components.css';
+@import './css/layers/patterns.css';
 @import './css/diagram.css';
 @import './css/prose.css';
 @import './css/motion.css';

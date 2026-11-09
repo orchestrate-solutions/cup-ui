@@ -22,8 +22,8 @@ const LAYER_MAP = {
     label: 'Tokens',
     properties: [], // tokens are custom properties, resolved in other layers
   },
-  'cup-nano': {
-    label: 'Nano',
+  'cup-elements': {
+    label: 'Elements',
     properties: [
       'display', 'font-size', 'font-weight', 'color', 'line-height',
       'width', 'height', 'border', 'border-radius', 'background-color',
@@ -31,8 +31,8 @@ const LAYER_MAP = {
       'outline-offset',
     ],
   },
-  'cup-micro': {
-    label: 'Micro',
+  'cup-components': {
+    label: 'Components',
     properties: [
       'display', 'gap', 'align-items', 'justify-content', 'cursor',
       'padding', 'font-size', 'font-weight', 'color', 'background-color',
@@ -40,8 +40,8 @@ const LAYER_MAP = {
       'text-decoration',
     ],
   },
-  'cup-component': {
-    label: 'Component',
+  'cup-patterns': {
+    label: 'Patterns',
     properties: [
       'display', 'flex-direction', 'contain', 'overflow', 'position',
       'padding', 'border-radius', 'background-color', 'box-shadow',
@@ -187,18 +187,18 @@ export class StyleTap {
     for (const cls of classes) {
       if (!cls.startsWith('cup-')) continue;
 
-      // Nano atoms: label, input, hint, error, icon, skeleton, divider
+      // Elements (was nano): label, input, hint, error, icon, skeleton, divider
       if (/^cup-(label|input|hint|error|icon|skeleton|divider)/.test(cls)) {
-        layers.add('cup-nano');
+        layers.add('cup-elements');
       }
-      // Micro composed: field, button, select, textarea, checkbox, radio, number,
+      // Components (was micro): field, button, select, textarea, checkbox, radio, number,
       // password, file, date, toggle, badge, chip
       else if (/^cup-(field|button|select|textarea|checkbox|radio|number|password|file|date|toggle|badge|chip)/.test(cls)) {
-        layers.add('cup-micro');
+        layers.add('cup-components');
       }
-      // Component organisms: card, modal, toast, nav, shell, accordion, tabs, table
+      // Patterns (was organisms): card, modal, toast, nav, shell, accordion, tabs, table
       else if (/^cup-(card|modal|toast|nav|shell|accordion|tabs|table)/.test(cls)) {
-        layers.add('cup-component');
+        layers.add('cup-patterns');
       }
     }
 

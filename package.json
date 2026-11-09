@@ -27,7 +27,8 @@
     "a11y.css"
   ],
   "scripts": {
-    "test": "npx cypress run",
+    "test": "bash scripts/test.sh",
+    "serve:test": "python3 -m http.server 8765 --bind 127.0.0.1",
     "test:open": "npx cypress open",
     "test:component": "npx cypress run --spec 'cypress/component/**/*.cy.js'",
     "test:e2e": "npx cypress run --spec 'cypress/e2e/**/*.cy.js'"

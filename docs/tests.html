@@ -64,7 +64,7 @@
     // Test 2: layer detection for nano elements
     {
       const layers = StyleTap._detectLayers(['cup-label']);
-      assert(layers.includes('cup-nano'), 'detectLayers: cup-label → cup-nano');
+      assert(layers.includes('cup-elements'), 'detectLayers: cup-label → cup-elements');
       assert(layers.includes('cup-reset'), 'detectLayers: always includes cup-reset');
       assert(layers.includes('cup-theme'), 'detectLayers: always includes cup-theme');
     }
@@ -72,13 +72,13 @@
     // Test 3: layer detection for micro elements
     {
       const layers = StyleTap._detectLayers(['cup-button', 'cup-button--primary']);
-      assert(layers.includes('cup-micro'), 'detectLayers: cup-button → cup-micro');
+      assert(layers.includes('cup-components'), 'detectLayers: cup-button → cup-components');
     }
 
     // Test 4: layer detection for component elements
     {
       const layers = StyleTap._detectLayers(['cup-card']);
-      assert(layers.includes('cup-component'), 'detectLayers: cup-card → cup-component');
+      assert(layers.includes('cup-patterns'), 'detectLayers: cup-card → cup-patterns');
     }
 
     // Test 5: inspect captures active tokens

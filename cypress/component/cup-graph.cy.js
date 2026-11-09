@@ -83,7 +83,7 @@ describe('cup-graph', () => {
   it('selects a node on click and marks its causes and effects', () => {
     cy.mount(GRAPH);
     cy.get('cup-node[node-id="b"]').click();
-    cy.get('cup-graph').should('have.attr', 'selected', 'b');
+    cy.get('cup-graph').should(($g) => expect($g[0].getAttribute('selected')).to.equal('b'));
     cy.get('cup-node[node-id="b"]').should('have.attr', 'state', 'focused');
     cy.get('cup-node[node-id="a"]').should('have.attr', 'state', 'upstream');
     cy.get('cup-node[node-id="c"]').should('have.attr', 'state', 'downstream');
@@ -117,7 +117,7 @@ describe('cup-graph', () => {
   it('selects with the keyboard', () => {
     cy.mount(GRAPH);
     cy.get('cup-node[node-id="c"]').should('have.attr', 'tabindex', '0').focus().type('{enter}');
-    cy.get('cup-graph').should('have.attr', 'selected', 'c');
+    cy.get('cup-graph').should(($g) => expect($g[0].getAttribute('selected')).to.equal('c'));
   });
 
   it('moves a node by dragging and the edges follow', () => {
@@ -162,7 +162,7 @@ describe('cup-graph', () => {
     drag('b', 60, 30);
     cy.get('cup-node[node-id="b"]').should('have.attr', 'x', '320');
     cy.get('cup-node[node-id="b"]').click();
-    cy.get('cup-graph').should('have.attr', 'selected', 'b');
+    cy.get('cup-graph').should(($g) => expect($g[0].getAttribute('selected')).to.equal('b'));
   });
 
   it('reads the graph out as a spec', () => {

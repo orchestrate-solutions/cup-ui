@@ -40,6 +40,8 @@ import './components/cup-progress.js';
 import './components/cup-canvas.js';
 import './components/cup-agent-chat.js';
 import './components/cup-markdown.js';
+import './components/cup-audio-wave.js';
+import './components/cup-viewport.js';
 
 // Diagram components
 import './components/cup-node.js';

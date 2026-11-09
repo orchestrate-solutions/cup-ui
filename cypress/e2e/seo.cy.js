@@ -126,7 +126,8 @@ describe('SEO Smoke Tests', () => {
     it('ItemList JSON-LD is injected for components', () => {
       cy.get('#main', { timeout: 10000 }).should('not.be.empty');
       // Wait for pipeline to inject the ItemList
-      cy.get('script[type="application/ld+json"]', { timeout: 10000 }).then(($els) => {
+      // A .should callback retries until the ItemList exists; a .then callback runs once.
+      cy.get('script[type="application/ld+json"]', { timeout: 10000 }).should(($els) => {
         const schemas = [...$els].map(el => JSON.parse(el.textContent));
         const list = schemas.find(s => s['@type'] === 'ItemList');
         expect(list).to.exist;

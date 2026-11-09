@@ -172,6 +172,33 @@
     color: var(--cup-color-on-surface);
   }
 
+  /* ── Code block copy button ── */
+  .cup-prose .cup-code-block {
+    position: relative;
+  }
+
+  .cup-prose .cup-code-block pre {
+    margin: 0;
+  }
+
+  .cup-prose .cup-copy-btn {
+    position: absolute;
+    top: var(--cup-space-sm);
+    right: var(--cup-space-sm);
+    padding: var(--cup-space-2xs);
+    opacity: 0;
+    transition: opacity var(--cup-transition-fast);
+  }
+
+  .cup-prose .cup-copy-btn--fail {
+    color: var(--cup-color-error);
+  }
+
+  .cup-prose .cup-code-block:hover .cup-copy-btn,
+  .cup-prose .cup-copy-btn:focus-visible {
+    opacity: 1;
+  }
+
   /* ── Table ── */
   .cup-prose table {
     width: 100%;
