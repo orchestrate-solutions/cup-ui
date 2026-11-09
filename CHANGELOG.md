@@ -22,7 +22,7 @@ change.
   serves it alone.
 - Component tests for every component that had none, and a test that the old
   layer file names give the same styles as the new files.
-- `SOURCE-MERGE.md`: the difference map, the component rules and the open findings.
+- `RULES.md`: the levels and the rules for a new part.
 
 ### Changed
 

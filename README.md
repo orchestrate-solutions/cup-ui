@@ -132,8 +132,7 @@ The old file names still work. Each one only imports its new file:
 | `<cup-audio-wave>` | Waveform of a live audio stream, or of a WAV or MP3 file with play and time |
 | `<cup-graph>`, `<cup-node>`, `<cup-edge>` | Diagrams from a JSON spec |
 
-The layer each component belongs to is in `SOURCE-MERGE.md`, "Component
-rules". Some components do not have a level yet.
+The levels and the rules for a new part are in [RULES.md](RULES.md). Some components do not have a level yet.
 
 ## License
 
